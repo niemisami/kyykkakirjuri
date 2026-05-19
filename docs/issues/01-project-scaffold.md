@@ -21,14 +21,14 @@ The app shell renders a minimal placeholder page so the dev server and test runn
 
 ## Acceptance criteria
 
-- [ ] `pnpm dev` starts the Vite dev server without errors
-- [ ] `pnpm test` runs Vitest and passes (at least one smoke test)
-- [ ] `pnpm build` produces a production bundle without errors
-- [ ] Tailwind utility classes apply correctly in the browser
-- [ ] A shadcn/ui primitive (e.g. Button) renders without errors
-- [ ] @tanstack/store and @tanstack/router are importable
-- [ ] Zod is importable and a trivial schema parses successfully
-- [ ] The single route `/` renders the placeholder page on a mobile viewport
+- [x] `pnpm dev` starts the Vite dev server without errors
+- [x] `pnpm test` runs Vitest and passes (at least one smoke test)
+- [x] `pnpm build` produces a production bundle without errors
+- [x] Tailwind utility classes apply correctly in the browser
+- [x] A shadcn/ui primitive (e.g. Button) renders without errors
+- [x] @tanstack/store and @tanstack/router are importable
+- [x] Zod is importable and a trivial schema parses successfully
+- [x] The single route `/` renders the placeholder page on a mobile viewport
 
 ## Blocked by
 
