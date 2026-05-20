@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { resetGame, getRoundScore, type GameState } from '@/lib/gameStore'
 import { scoreGame } from '@/lib/scoring'
+import { deriveAkat, type PlayerThrowRecord } from '@/lib/schemas'
 
 interface ResultsStepProps {
   state: GameState
@@ -70,19 +71,26 @@ export function ResultsStep({ state }: ResultsStepProps) {
                   return (
                     <div key={ti} className="space-y-1">
                       <p className="text-xs font-medium">{teams[ti].name}</p>
-                      {turns.map((turn, i) => (
-                        <div
-                          key={i}
-                          className="text-xs bg-muted/50 rounded px-2 py-1 flex justify-between"
-                        >
-                          <span>Vuoro {i + 1}</span>
-                          <span>
-                            {turn.result.fieldCleared
-                              ? `+${turn.result.unusedKartut}`
-                              : `A:${turn.akat} P:${turn.papit}`}
-                          </span>
-                        </div>
-                      ))}
+                      {turns.map((turn, i) => {
+                        const throwsSoFar = turns
+                          .slice(0, i + 1)
+                          .flatMap((t) => Array.from(t.throws) as PlayerThrowRecord[])
+                        const akat = deriveAkat(throwsSoFar)
+                        const papit = turn.throws[turn.throws.length - 1].pappiCount
+                        return (
+                          <div
+                            key={i}
+                            className="text-xs bg-muted/50 rounded px-2 py-1 flex justify-between"
+                          >
+                            <span>Vuoro {i + 1}</span>
+                            <span>
+                              {turn.result.fieldCleared
+                                ? `+${turn.result.unusedKartut}`
+                                : `A:${akat} P:${papit}`}
+                            </span>
+                          </div>
+                        )
+                      })}
                       {override !== undefined && (
                         <div className="text-xs bg-yellow-100 rounded px-2 py-1 flex justify-between">
                           <span>Korjaus</span>

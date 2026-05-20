@@ -3,6 +3,8 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { startGame } from '@/lib/gameStore'
 
+const PLAYER_COUNT = 4
+
 const GameSetupFormSchema = z.object({
   teamA: z.object({
     name: z.string().min(1, 'Joukkueen nimi ei voi olla tyhjä'),
@@ -17,14 +19,15 @@ const GameSetupFormSchema = z.object({
       .array(z.object({ name: z.string().min(1, 'Pelaajan nimi ei voi olla tyhjä') }))
       .min(1, 'Joukkueessa pitää olla vähintään 1 pelaaja')
       .max(4, 'Joukkueessa voi olla enintään 4 pelaajaa'),
+
   }),
 })
 
 export function SetupStep() {
   const form = useForm({
     defaultValues: {
-      teamA: { name: '', players: [{ name: '' }] },
-      teamB: { name: '', players: [{ name: '' }] },
+      teamA: { name: '', players: Array.from({ length: PLAYER_COUNT }, () => ({ name: '' })) },
+      teamB: { name: '', players: Array.from({ length: PLAYER_COUNT }, () => ({ name: '' })) },
     },
     validators: { onSubmit: GameSetupFormSchema },
     onSubmit: ({ value }) => {
@@ -80,7 +83,7 @@ export function SetupStep() {
               )}
             </form.Field>
 
-            {/* Players array */}
+            {/* Players */}
             <form.Field name={`${teamKey}.players`} mode="array">
               {(playersField) => (
                 <div className="space-y-2">
@@ -90,26 +93,13 @@ export function SetupStep() {
                     <form.Field key={i} name={`${teamKey}.players[${i}].name`}>
                       {(subField) => (
                         <div className="space-y-1">
-                          <div className="flex gap-2">
-                            <input
-                              value={subField.state.value}
-                              onChange={(e) => subField.handleChange(e.target.value)}
-                              onBlur={subField.handleBlur}
-                              placeholder={`Pelaaja ${i + 1}`}
-                              className="flex-1 rounded-lg border px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-ring"
-                            />
-                            {playersField.state.value.length > 1 && (
-                              <Button
-                                type="button"
-                                variant="destructive"
-                                size="icon-lg"
-                                onClick={() => playersField.removeValue(i)}
-                                aria-label="Poista pelaaja"
-                              >
-                                ×
-                              </Button>
-                            )}
-                          </div>
+                          <input
+                            value={subField.state.value}
+                            onChange={(e) => subField.handleChange(e.target.value)}
+                            onBlur={subField.handleBlur}
+                            placeholder={`Pelaaja ${i + 1}`}
+                            className="w-full rounded-lg border px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-ring"
+                          />
                           {subField.state.meta.errors.length > 0 && (
                             <p className="text-sm text-destructive">
                               {subField.state.meta.errors.join(', ')}
@@ -119,23 +109,6 @@ export function SetupStep() {
                       )}
                     </form.Field>
                   ))}
-
-                  {playersField.state.meta.errors.length > 0 && (
-                    <p className="text-sm text-destructive">
-                      {playersField.state.meta.errors.join(', ')}
-                    </p>
-                  )}
-
-                  {playersField.state.value.length < 4 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => playersField.pushValue({ name: '' })}
-                    >
-                      + Lisää pelaaja
-                    </Button>
-                  )}
                 </div>
               )}
             </form.Field>
