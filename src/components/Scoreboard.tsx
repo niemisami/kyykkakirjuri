@@ -16,27 +16,45 @@ export function Scoreboard({ teamAName, teamBName, round1, round2, roundIndex }:
   const r2B = getRoundScore(round2, 1)
 
   const showTotal = roundIndex === 1 && round1 !== null
+  const currentA = roundIndex === 0 ? r1A : r2A
+  const currentB = roundIndex === 0 ? r1B : r2B
 
   return (
-    <div className="bg-muted rounded-xl p-3 grid grid-cols-3 gap-2 text-center text-sm">
-      <div className="font-semibold truncate">{teamAName}</div>
-      <div className="text-muted-foreground font-medium">Erä {roundIndex + 1}</div>
-      <div className="font-semibold truncate">{teamBName}</div>
+    <section className="glass-panel rounded-3xl p-6 flex flex-col items-center gap-4 shadow-sm">
+      <div className="flex justify-between w-full items-start">
+        <div className="text-center flex-1">
+          <p className="text-label-caps text-muted-foreground mb-1">{teamAName.toUpperCase()}</p>
+          <p className="text-score-display text-primary transition-all duration-300">{currentA}</p>
+        </div>
 
-      <div className="text-xl font-bold">{roundIndex === 0 ? r1A : r2A}</div>
-      <div className="text-muted-foreground text-xs self-center">pistettä</div>
-      <div className="text-xl font-bold">{roundIndex === 0 ? r1B : r2B}</div>
+        <div className="flex flex-col items-center justify-center px-4 pt-4 gap-1">
+          <span className="text-label-caps text-muted-foreground bg-muted px-2 py-1 rounded-full">
+            ERÄ {roundIndex + 1}
+          </span>
+          <p className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60">
+            pistettä
+          </p>
+        </div>
+
+        <div className="text-center flex-1">
+          <p className="text-label-caps text-muted-foreground mb-1">{teamBName.toUpperCase()}</p>
+          <p className="text-score-display text-foreground transition-all duration-300">{currentB}</p>
+        </div>
+      </div>
 
       {showTotal && (() => {
         const game = scoreGame({ teamA: r1A, teamB: r1B }, { teamA: r2A, teamB: r2B })
         return (
           <>
-            <div className="text-muted-foreground text-xs">Yhteensä: {game.teamA}</div>
-            <div />
-            <div className="text-muted-foreground text-xs">Yhteensä: {game.teamB}</div>
+            <div className="w-full h-px bg-border/40" />
+            <div className="flex gap-3 text-[12px] text-muted-foreground flex-wrap justify-center">
+              <span>Erä 1: {r1A} – {r1B}</span>
+              <span>•</span>
+              <span className="font-bold">Yhteensä: {game.teamA} – {game.teamB}</span>
+            </div>
           </>
         )
       })()}
-    </div>
+    </section>
   )
 }
