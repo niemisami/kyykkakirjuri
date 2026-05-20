@@ -19,16 +19,16 @@ The core live-scoring loop: the referee records akkat and papit after each turn,
 
 ## Acceptance criteria
 
-- [ ] Active team name and throwing player pair are displayed for each turn
-- [ ] Akkat and papit inputs reject values where akkat + papit > 40 with a Finnish error message
-- [ ] Cleared count (`40 − akkat − papit`) updates live as values change
-- [ ] Confirming a turn advances to the next team's turn
-- [ ] Teams alternate correctly: Team A → Team B → Team A → … for 8 total turns
-- [ ] Running round scores for both teams update after each confirmed turn
-- [ ] Progress indicator reflects remaining turns in the round
-- [ ] After the 8th turn the store transitions to the `halftime` phase
-- [ ] `TurnInputSchema` Vitest tests pass
-- [ ] Store transition tests pass (8-turn flow through to halftime)
+- [x] Active team name and throwing player pair are displayed for each turn
+- [x] Akkat and papit inputs reject values where akkat + papit > 40 with a Finnish error message
+- [x] Cleared count (`40 − akkat − papit`) updates live as values change
+- [x] Confirming a turn advances to the next team's turn
+- [x] Teams alternate correctly: Team A → Team B → Team A → … for 8 total turns
+- [x] Running round scores for both teams update after each confirmed turn
+- [x] Progress indicator reflects remaining turns in the round
+- [x] After the 8th turn the store transitions to the `halftime` phase
+- [x] `TurnInputSchema` Vitest tests pass
+- [x] Store transition tests pass (8-turn flow through to halftime)
 
 ## Blocked by
 
