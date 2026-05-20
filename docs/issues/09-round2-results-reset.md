@@ -21,15 +21,15 @@ Complete the full game loop: round 2 plays out using the same TurnStep flow, the
 
 ## Acceptance criteria
 
-- [ ] Round 2 uses the same TurnStep with a visible "Erä 2" label
-- [ ] Edit turn, round override, and field-cleared (Issues 5–7) work in round 2 as in round 1
-- [ ] After the last turn of round 2 the app automatically shows the results screen
-- [ ] Results screen shows round 1 score, round 2 score, and total for each team
-- [ ] Winner (or tie) is declared clearly in Finnish
-- [ ] Per-turn akkat/papit breakdown is visible for both rounds
-- [ ] "Uusi peli" button resets to the setup step without a page reload
-- [ ] All game data is cleared after reset — the setup step is blank
-- [ ] Full state machine Vitest tests pass (`setup → round → halftime → round → finished → setup`)
+- [x] Round 2 uses the same TurnStep with a visible "Erä 2" label
+- [x] Edit turn, round override, and field-cleared (Issues 5–7) work in round 2 as in round 1
+- [x] After the last turn of round 2 the app automatically shows the results screen
+- [x] Results screen shows round 1 score, round 2 score, and total for each team
+- [x] Winner (or tie) is declared clearly in Finnish
+- [x] Per-turn akkat/papit breakdown is visible for both rounds
+- [x] "Uusi peli" button resets to the setup step without a page reload
+- [x] All game data is cleared after reset — the setup step is blank
+- [x] Full state machine Vitest tests pass (`setup → round → halftime → round → finished → setup`)
 
 ## Blocked by
 
