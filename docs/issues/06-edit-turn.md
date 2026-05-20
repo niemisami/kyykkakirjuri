@@ -17,13 +17,13 @@ The referee can open any previously recorded turn in the current round, correct 
 
 ## Acceptance criteria
 
-- [ ] History panel lists all confirmed turns for the current round
-- [ ] Tapping a history entry opens it in an editable form pre-filled with the recorded values
-- [ ] Validation (akkat + papit ≤ 40) applies to edits
-- [ ] Saving an edit overwrites the stored result
-- [ ] Running round scores recalculate correctly after the edit
-- [ ] Cancelling an edit leaves the original value unchanged
-- [ ] Store `editTurn` Vitest tests pass
+- [x] History panel lists all confirmed turns for the current round
+- [x] Tapping a history entry opens it in an editable form pre-filled with the recorded values
+- [x] Validation (akkat + papit ≤ 40) applies to edits
+- [x] Saving an edit overwrites the stored result
+- [x] Running round scores recalculate correctly after the edit
+- [x] Cancelling an edit leaves the original value unchanged
+- [x] Store `editTurn` Vitest tests pass
 
 ## Blocked by
 
