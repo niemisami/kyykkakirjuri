@@ -19,12 +19,12 @@ Field-cleared detection is already implemented in the scoring engine (Issue 2); 
 
 ## Acceptance criteria
 
-- [ ] Entering akkat = 0 + papit = 0 triggers the field-cleared path
-- [ ] A Finnish-language banner displays the bonus point total
-- [ ] The cleared team's remaining turns are skipped without requiring referee action
-- [ ] The scoreboard updates immediately to show the positive round score
-- [ ] Normal play (no clear) is unaffected
-- [ ] Store tests verify the skip-remaining-turns transition
+- [x] Entering akkat = 0 + papit = 0 triggers the field-cleared path
+- [x] A Finnish-language banner displays the bonus point total
+- [x] The cleared team's remaining turns are skipped without requiring referee action
+- [x] The scoreboard updates immediately to show the positive round score
+- [x] Normal play (no clear) is unaffected
+- [x] Store tests verify the skip-remaining-turns transition
 
 ## Blocked by
 
