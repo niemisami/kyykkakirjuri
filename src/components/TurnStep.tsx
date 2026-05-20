@@ -4,8 +4,9 @@ import type { AnyFieldApi } from '@tanstack/react-form'
 import { Button } from '@/components/ui/button'
 import { Scoreboard } from './Scoreboard'
 import {
-  recordTurn,
+  recordPlayerThrow,
   editTurn,
+  editPlayerThrow,
   overrideRoundScore,
   dismissFieldClearedBanner,
   getActiveTeamIndex,
@@ -14,8 +15,9 @@ import {
   type GameState,
   type TurnRecord,
 } from '@/lib/gameStore'
+import { deriveAkat, type PlayerThrowRecord } from '@/lib/schemas'
 import { getPlayerPair } from '@/lib/playerPairing'
-import { TurnInputSchema, RoundOverrideSchema } from '@/lib/schemas'
+import { PlayerThrowInputSchema, RoundOverrideSchema } from '@/lib/schemas'
 
 function fieldErrors(field: AnyFieldApi): string {
   return field.state.meta.errors
@@ -29,10 +31,11 @@ interface TurnStepProps {
 }
 
 export function TurnStep({ state }: TurnStepProps) {
-  const { teams, rounds, roundIndex, turnIndex, fieldClearedBanner } = state
+  const { teams, rounds, roundIndex, turnIndex, playerThrowIndex, fieldClearedBanner } = state
   const [editingEntry, setEditingEntry] = useState<{
     teamIndex: 0 | 1
     teamTurnIndex: number
+    playerThrowIndex?: 0 | 1 // undefined = full-turn edit
   } | null>(null)
   const [overrideTeam, setOverrideTeam] = useState<0 | 1 | null>(null)
 
@@ -49,6 +52,11 @@ export function TurnStep({ state }: TurnStepProps) {
     4 - teamATurns.length,
     4 - teamBTurns.length,
   ]
+
+  // Cumulative throws for the active team this round (for live akat derivation)
+  const activeTurns = activeTeamIndex === 0 ? teamATurns : teamBTurns
+  // For throw 1: preceding completed turns. For throw 2: includes the first throw of current turn.
+  const precedingThrows = activeTurns.flatMap((t) => Array.from(t.throws) as PlayerThrowRecord[])
 
   return (
     <div className="mx-auto max-w-lg px-4 py-4 space-y-4">
@@ -92,11 +100,12 @@ export function TurnStep({ state }: TurnStepProps) {
       {/* Edit form */}
       {editingEntry !== null && (
         <EditForm
-          key={`${editingEntry.teamIndex}-${editingEntry.teamTurnIndex}`}
+          key={`${editingEntry.teamIndex}-${editingEntry.teamTurnIndex}-${editingEntry.playerThrowIndex ?? 'turn'}`}
           teamName={teams[editingEntry.teamIndex].name}
           roundIdx={roundIndex}
           teamIndex={editingEntry.teamIndex}
           teamTurnIndex={editingEntry.teamTurnIndex}
+          playerThrowIndex={editingEntry.playerThrowIndex}
           existing={
             (editingEntry.teamIndex === 0 ? teamATurns : teamBTurns)[editingEntry.teamTurnIndex]
           }
@@ -111,6 +120,8 @@ export function TurnStep({ state }: TurnStepProps) {
           activeTeamName={activeTeam.name}
           playerPair={playerPair}
           teamTurnIndex={teamTurnIndex}
+          playerThrowIndex={playerThrowIndex}
+          precedingThrows={precedingThrows}
         />
       )}
 
@@ -121,7 +132,10 @@ export function TurnStep({ state }: TurnStepProps) {
           teamATurns={teamATurns}
           teamBTurns={teamBTurns}
           round={round ?? null}
-          onEdit={(teamIndex, teamTurnIdx) =>
+          onEditThrow={(teamIndex, teamTurnIdx, throwIdx) =>
+            setEditingEntry({ teamIndex, teamTurnIndex: teamTurnIdx, playerThrowIndex: throwIdx })
+          }
+          onEditTurn={(teamIndex, teamTurnIdx) =>
             setEditingEntry({ teamIndex, teamTurnIndex: teamTurnIdx })
           }
           onOverride={(teamIndex) => setOverrideTeam(teamIndex)}
@@ -137,16 +151,22 @@ function RecordForm({
   activeTeamName,
   playerPair,
   teamTurnIndex,
+  playerThrowIndex,
+  precedingThrows,
 }: {
   activeTeamName: string
   playerPair: [string, string]
   teamTurnIndex: number
+  playerThrowIndex: 0 | 1
+  precedingThrows: PlayerThrowRecord[]
 }) {
+  const currentPlayerName = playerPair[playerThrowIndex]
+
   const form = useForm({
-    defaultValues: { akat: 0, papit: 0 },
-    validators: { onSubmit: TurnInputSchema },
+    defaultValues: { knockedOut: 0, pappiCount: 0 },
+    validators: { onSubmit: PlayerThrowInputSchema },
     onSubmit: ({ value }) => {
-      recordTurn(value.akat, value.papit)
+      recordPlayerThrow(value.knockedOut, value.pappiCount)
       form.reset()
     },
   })
@@ -156,7 +176,7 @@ function RecordForm({
       <div className="text-center space-y-1">
         <p className="text-lg font-bold">{activeTeamName}</p>
         <p className="text-sm text-muted-foreground">
-          Vuoro {teamTurnIndex + 1}/4 · {playerPair[0]} &amp; {playerPair[1]}
+          Vuoro {teamTurnIndex + 1}/4 · Pelaaja {playerThrowIndex + 1}/2: {currentPlayerName}
         </p>
       </div>
 
@@ -169,10 +189,10 @@ function RecordForm({
         className="space-y-4"
       >
         <div className="grid grid-cols-2 gap-4">
-          <form.Field name="akat">
+          <form.Field name="knockedOut">
             {(field) => (
               <NumberStepper
-                label="Akat"
+                label="Poistetut"
                 value={field.state.value}
                 onChange={field.handleChange}
                 field={field}
@@ -180,7 +200,7 @@ function RecordForm({
             )}
           </form.Field>
 
-          <form.Field name="papit">
+          <form.Field name="pappiCount">
             {(field) => (
               <NumberStepper
                 label="Papit"
@@ -192,12 +212,16 @@ function RecordForm({
           </form.Field>
         </div>
 
-        <form.Subscribe selector={(s) => [s.values.akat, s.values.papit] as const}>
-          {([akat, papit]) => (
-            <p className="text-center text-sm text-muted-foreground">
-              Tyhjennetty: {Math.max(0, akat + papit)} kyykkää
-            </p>
-          )}
+        <form.Subscribe selector={(s) => [s.values.knockedOut, s.values.pappiCount] as const}>
+          {([knockedOut, pappiCount]) => {
+            const allThrows = [...precedingThrows, { knockedOut, pappiCount }]
+            const akat = Math.max(0, deriveAkat(allThrows))
+            return (
+              <p className="text-center text-sm text-muted-foreground">
+                Akat: <span className="font-semibold">{akat}</span>
+              </p>
+            )
+          }}
         </form.Subscribe>
 
         <Button type="submit" size="lg" className="w-full">
@@ -215,6 +239,7 @@ function EditForm({
   roundIdx,
   teamIndex,
   teamTurnIndex,
+  playerThrowIndex,
   existing,
   onSave,
   onCancel,
@@ -223,28 +248,51 @@ function EditForm({
   roundIdx: 0 | 1
   teamIndex: 0 | 1
   teamTurnIndex: number
+  playerThrowIndex?: 0 | 1 // undefined = full-turn edit (both throws)
   existing?: TurnRecord
   onSave: () => void
   onCancel: () => void
 }) {
+  const isFullTurnEdit = playerThrowIndex === undefined
+  const targetThrow =
+    playerThrowIndex !== undefined ? existing?.throws[playerThrowIndex] : undefined
+
   const form = useForm({
     defaultValues: {
-      akat: existing?.akat ?? 0,
-      papit: existing?.papit ?? 0,
+      knockedOut: targetThrow?.knockedOut ?? 0,
+      pappiCount: targetThrow?.pappiCount ?? 0,
+      // For full-turn edit, second throw fields
+      knockedOut2: existing?.throws[1]?.knockedOut ?? 0,
+      pappiCount2: existing?.throws[1]?.pappiCount ?? 0,
     },
-    validators: { onSubmit: TurnInputSchema },
+    validators: { onSubmit: PlayerThrowInputSchema },
     onSubmit: ({ value }) => {
-      editTurn(roundIdx, teamIndex, teamTurnIndex, value.akat, value.papit)
+      if (isFullTurnEdit) {
+        const throw1: PlayerThrowRecord = { knockedOut: value.knockedOut, pappiCount: value.pappiCount }
+        const throw2: PlayerThrowRecord = { knockedOut: value.knockedOut2, pappiCount: value.pappiCount2 }
+        editTurn(roundIdx, teamIndex, teamTurnIndex, throw1, throw2)
+      } else {
+        editPlayerThrow(
+          roundIdx,
+          teamIndex,
+          teamTurnIndex,
+          playerThrowIndex!,
+          value.knockedOut,
+          value.pappiCount,
+        )
+      }
       onSave()
     },
   })
 
+  const label = isFullTurnEdit
+    ? `Muokkaa: ${teamName} – vuoro ${teamTurnIndex + 1}`
+    : `Muokkaa: ${teamName} – vuoro ${teamTurnIndex + 1}, heitto ${playerThrowIndex! + 1}`
+
   return (
     <div className="rounded-xl border border-orange-300 bg-orange-50 p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <p className="font-semibold">
-          Muokkaa: {teamName} – vuoro {teamTurnIndex + 1}
-        </p>
+        <p className="font-semibold">{label}</p>
         <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
           Peruuta
         </Button>
@@ -258,11 +306,14 @@ function EditForm({
         }}
         className="space-y-4"
       >
+        <p className="text-xs text-muted-foreground">
+          {isFullTurnEdit ? 'Heitto 1' : `Heitto ${playerThrowIndex! + 1}`}
+        </p>
         <div className="grid grid-cols-2 gap-4">
-          <form.Field name="akat">
+          <form.Field name="knockedOut">
             {(field) => (
               <NumberStepper
-                label="Akat"
+                label="Poistetut"
                 value={field.state.value}
                 onChange={field.handleChange}
                 field={field}
@@ -270,7 +321,7 @@ function EditForm({
             )}
           </form.Field>
 
-          <form.Field name="papit">
+          <form.Field name="pappiCount">
             {(field) => (
               <NumberStepper
                 label="Papit"
@@ -281,6 +332,35 @@ function EditForm({
             )}
           </form.Field>
         </div>
+
+        {isFullTurnEdit && (
+          <>
+            <p className="text-xs text-muted-foreground">Heitto 2</p>
+            <div className="grid grid-cols-2 gap-4">
+              <form.Field name="knockedOut2">
+                {(field) => (
+                  <NumberStepper
+                    label="Poistetut"
+                    value={field.state.value}
+                    onChange={field.handleChange}
+                    field={field}
+                  />
+                )}
+              </form.Field>
+
+              <form.Field name="pappiCount2">
+                {(field) => (
+                  <NumberStepper
+                    label="Papit"
+                    value={field.state.value}
+                    onChange={field.handleChange}
+                    field={field}
+                  />
+                )}
+              </form.Field>
+            </div>
+          </>
+        )}
 
         <form.Subscribe selector={(s) => s.errors}>
           {(errors) => {
@@ -384,14 +464,16 @@ function HistoryPanel({
   teamATurns,
   teamBTurns,
   round,
-  onEdit,
+  onEditThrow,
+  onEditTurn,
   onOverride,
 }: {
   teams: GameState['teams']
   teamATurns: TurnRecord[]
   teamBTurns: TurnRecord[]
   round: import('@/lib/gameStore').RoundData | null
-  onEdit: (teamIndex: 0 | 1, teamTurnIndex: number) => void
+  onEditThrow: (teamIndex: 0 | 1, teamTurnIndex: number, playerThrowIndex: 0 | 1) => void
+  onEditTurn: (teamIndex: 0 | 1, teamTurnIndex: number) => void
   onOverride: (teamIndex: 0 | 1) => void
 }) {
   const totalTurns = teamATurns.length + teamBTurns.length
@@ -421,28 +503,45 @@ function HistoryPanel({
               </Button>
             </div>
             {turns.map((turn, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between text-sm bg-muted/50 rounded-lg px-3 py-2"
-              >
-                <span className="text-muted-foreground">Vuoro {i + 1}</span>
-                <span>
-                  {turn.result.fieldCleared ? (
-                    <span className="text-green-700 font-medium">
-                      Kenttä tyhjä! +{turn.result.unusedKartut}
+              <div key={i} className="rounded-lg bg-muted/50 px-3 py-2 space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Vuoro {i + 1}</span>
+                  <span>
+                    {turn.result.fieldCleared ? (
+                      <span className="text-green-700 font-medium">
+                        Kenttä tyhjä! +{turn.result.unusedKartut}
+                      </span>
+                    ) : (
+                      <span>{turn.result.points}p</span>
+                    )}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="xs"
+                    onClick={() => onEditTurn(teamIdx, i)}
+                  >
+                    Muokkaa vuoroa
+                  </Button>
+                </div>
+                {(Array.from(turn.throws) as PlayerThrowRecord[]).map((thr, throwIdx) => (
+                  <div
+                    key={throwIdx}
+                    className="flex items-center justify-between text-xs text-muted-foreground pl-2"
+                  >
+                    <span>
+                      H{throwIdx + 1}: poistetut {thr.knockedOut} · papit {thr.pappiCount}
                     </span>
-                  ) : (
-                    `A: ${turn.akat} · P: ${turn.papit} (${turn.result.points}p)`
-                  )}
-                </span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="xs"
-                  onClick={() => onEdit(teamIdx, i)}
-                >
-                  Muokkaa
-                </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="xs"
+                      onClick={() => onEditThrow(teamIdx, i, throwIdx as 0 | 1)}
+                    >
+                      Muokkaa
+                    </Button>
+                  </div>
+                ))}
               </div>
             ))}
           </div>

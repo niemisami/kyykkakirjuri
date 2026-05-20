@@ -1,6 +1,6 @@
 # Kyykkakirjuri
 
-A mobile-web scorekeeping app for referees and scorekeepers tracking a live kyykkä game. Captures the state of both target squaret after each heittovuoro, calculates round and peli scores, and guides the referee through the game flow.
+A mobile-web scorekeeping app for referees and scorekeepers tracking a live kyykkä game. Captures the state of both target squaret after each player turn, calculates round and peli scores, and guides the referee through the game flow.
 
 ## Language
 
@@ -12,7 +12,7 @@ Finnish: Kyykkä
 _Avoid_: pin, peg, block, skittle
 
 **Karttu**:
-The wooden throwing stick used to knock kyykät out of the target square. Each heittovuoro uses 4 kartut (2 players × 2 throws each).
+The wooden throwing stick used to knock kyykät out of the target square. Each turn uses 4 kartut (2 players × 2 throws each).
 _Avoid_: bat, stick, baton, throw (when referring to the object)
 Finnish: Karttu
 
@@ -41,12 +41,21 @@ Finnish: Erä
 _Avoid_: half, period, set
 
 **Turn**:
-One team's throwing turn: 2 players each throw 2 kartut (4 kartut total). Players are paired by playing order: players 1 & 2 form the first pair, players 3 & 4 the second. Pairs rotate: 1+2, 3+4, 1+2, 3+4 within an round. After each heittovuoro, the referee records the current akka and pappi counts.
+One team's throwing turn: 2 players each throw 2 kartut (4 kartut total). Players are paired by playing order: players 1 & 2 form the first pair, players 3 & 4 the second. Pairs rotate: 1+2, 3+4, 1+2, 3+4 within a round. A turn contains exactly 2 player throws.
 Finnish: Heittovuoro
 _Avoid_: "round"
 
+**Player throw**:
+One player's throwing opportunity within a turn: 2 kartut. After each player throw, the referee records (1) the **knockedOut** count — how many kyykät (of any type) left the game square during this throw — and (2) the current **pappiCount** on the boundary. The app derives akat as `40 − ΣknockedOut − pappiCount`. Field-cleared is detectable after either player throw; if it occurs after the first throw, the second player does not throw.
+Finnish: Pelaajan heittovuoro
+
+**Knocked out (poistettu)**:
+A kyykkä that has left the game square entirely during a player throw, whether it was previously inside (akka) or on the boundary (pappi). Recorded per throw as `knockedOut` — a delta of how many exited during this specific throw, not a running total. The cumulative sum across all player throws in a round, combined with the current `pappiCount`, gives: `akat = 40 − ΣknockedOut − pappiCount`.
+Finnish singular: poistettu. Finnish plural / UI label: Poistetut.
+_Avoid_: cleared (use "field cleared" only for the scoring event), removed
+
 **Opening turn**:
-The mandatory opening throw of a game. It must knock at least one kyykkä out of the target square before regular play continues. In this app, the avaus is treated as part of the first heittovuoro — no separate tracking.
+The mandatory opening throw of a game. It must knock at least one kyykkä out of the target square before regular play continues. In this app, the avaus is treated as part of the first turn — no separate tracking.
 Finnish: Avaus
 _Avoid_: opening throw, first throw (when referring to the rule concept)
 

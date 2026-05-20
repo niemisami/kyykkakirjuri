@@ -21,6 +21,45 @@ export const GameSetupSchema = z.object({
 
 export type GameSetupInput = z.infer<typeof GameSetupSchema>
 
+// ── Issue 11: Player-throw input ─────────────────────────────────────────────
+
+export interface PlayerThrowRecord {
+  knockedOut: number // delta: exits this throw (akat or pappi)
+  pappiCount: number // snapshot: boundary count right now
+}
+
+/**
+ * Derives the number of akat (kyykät inside the target square) from the
+ * cumulative throw history for a team's round.
+ * @param throwHistory All PlayerThrowRecords for the round so far, including the current throw
+ */
+export function deriveAkat(throwHistory: PlayerThrowRecord[]): number {
+  const totalKnockedOut = throwHistory.reduce((sum, t) => sum + t.knockedOut, 0)
+  const lastPappiCount =
+    throwHistory.length > 0 ? throwHistory[throwHistory.length - 1].pappiCount : 0
+  return 40 - totalKnockedOut - lastPappiCount
+}
+
+export const PlayerThrowInputSchema = z
+  .object({
+    knockedOut: z
+      .number()
+      .int()
+      .min(0, 'Poistetut ei voi olla negatiivinen')
+      .max(40, 'Poistetut-arvo liian suuri'),
+    pappiCount: z
+      .number()
+      .int()
+      .min(0, 'Papit ei voi olla negatiivinen')
+      .max(40, 'Pappi-arvo liian suuri'),
+  })
+  .refine((v) => v.knockedOut + v.pappiCount <= 40, {
+    message: 'Poistetut ja papit yhteensä enintään 40',
+    path: ['knockedOut'],
+  })
+
+export type PlayerThrowInput = z.infer<typeof PlayerThrowInputSchema>
+
 // ── Issue 4: Turn input ───────────────────────────────────────────────────────
 
 export const TurnInputSchema = z

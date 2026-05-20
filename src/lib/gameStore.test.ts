@@ -2,14 +2,27 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import {
   gameStore,
   startGame,
-  recordTurn,
+  recordPlayerThrow,
   editTurn,
+  editPlayerThrow,
   overrideRoundScore,
   confirmHalftime,
   resetGame,
   getRoundScore,
   getNextTurnIndex,
 } from './gameStore'
+import { deriveAkat } from './schemas'
+
+/** Record a neutral (non-clearing) turn with two throws — field remains unchanged. */
+function recordNeutralTurn() {
+  recordPlayerThrow(0, 0) // throw 1: nothing knocked out
+  recordPlayerThrow(0, 0) // throw 2: nothing knocked out
+}
+
+/** Record a clearing turn on throw 1 — all 40 knocked out. */
+function recordClearingTurn() {
+  recordPlayerThrow(40, 0) // throw 1: field cleared
+}
 
 function freshGame() {
   startGame('Koti', ['Alice', 'Bob', 'Carol', 'Dave'], 'Vieras', ['Eve', 'Frank', 'Grace', 'Hank'])
@@ -35,10 +48,11 @@ describe('startGame', () => {
     expect(gameStore.state.teams[1].name).toBe('Vieras')
   })
 
-  it('starts at roundIndex 0, turnIndex 0', () => {
+  it('starts at roundIndex 0, turnIndex 0, playerThrowIndex 0', () => {
     freshGame()
     expect(gameStore.state.roundIndex).toBe(0)
     expect(gameStore.state.turnIndex).toBe(0)
+    expect(gameStore.state.playerThrowIndex).toBe(0)
   })
 
   it('initialises an empty round 0', () => {
@@ -64,7 +78,6 @@ describe('getNextTurnIndex', () => {
   })
 
   it('skips team A turns when team A cleared', () => {
-    // After turn 0 (team A), next is 1 (team B). Then 2 (team A) is skipped → 3 (team B)
     expect(getNextTurnIndex(0, true, false)).toBe(1)
     expect(getNextTurnIndex(1, true, false)).toBe(3)
     expect(getNextTurnIndex(3, true, false)).toBe(5)
@@ -84,123 +97,219 @@ describe('getNextTurnIndex', () => {
   })
 })
 
-// ── Issue 4: recordTurn — basic flow ─────────────────────────────────────────
+// ── Issue 4: recordPlayerThrow — basic flow ───────────────────────────────────
 
-describe('recordTurn — basic flow', () => {
-  it('appends to the active team and advances turnIndex', () => {
+describe('recordPlayerThrow — basic flow', () => {
+  it('throw 1 advances playerThrowIndex to 1 without changing turnIndex', () => {
     freshGame()
-    recordTurn(5, 1) // turn 0 → team A
+    recordPlayerThrow(0, 0)
+    expect(gameStore.state.playerThrowIndex).toBe(1)
+    expect(gameStore.state.turnIndex).toBe(0)
+    expect(gameStore.state.rounds[0]!.teamATurns).toHaveLength(1) // incomplete turn added
+  })
+
+  it('throw 2 finalises the turn and advances turnIndex', () => {
+    freshGame()
+    recordPlayerThrow(0, 0) // throw 1
+    recordPlayerThrow(0, 0) // throw 2
+    expect(gameStore.state.playerThrowIndex).toBe(0)
     expect(gameStore.state.turnIndex).toBe(1)
-    expect(gameStore.state.rounds[0]!.teamATurns).toHaveLength(1)
-    expect(gameStore.state.rounds[0]!.teamBTurns).toHaveLength(0)
+    expect(gameStore.state.rounds[0]!.teamATurns).toHaveLength(1) // still 1 turn, now complete
+    expect(gameStore.state.rounds[0]!.teamATurns[0].throws).toHaveLength(2)
+  })
+
+  it('stores correct throw data', () => {
+    freshGame()
+    recordPlayerThrow(5, 0) // throw 1
+    recordPlayerThrow(3, 1) // throw 2
+    const turn = gameStore.state.rounds[0]!.teamATurns[0]
+    expect(turn.throws[0]).toEqual({ knockedOut: 5, pappiCount: 0 })
+    expect(turn.throws[1]).toEqual({ knockedOut: 3, pappiCount: 1 })
   })
 
   it('alternates between teams correctly over 4 turns', () => {
     freshGame()
-    recordTurn(5, 1) // turn 0: A
-    recordTurn(3, 2) // turn 1: B
-    recordTurn(4, 0) // turn 2: A
-    recordTurn(2, 1) // turn 3: B
+    recordNeutralTurn() // turn 0: A
+    recordNeutralTurn() // turn 1: B
+    recordNeutralTurn() // turn 2: A
+    recordNeutralTurn() // turn 3: B
     const r = gameStore.state.rounds[0]!
     expect(r.teamATurns).toHaveLength(2)
     expect(r.teamBTurns).toHaveLength(2)
     expect(gameStore.state.turnIndex).toBe(4)
   })
 
-  it('transitions to halftime after the 8th turn', () => {
+  it('transitions to halftime after all 8 turns', () => {
     freshGame()
-    // 8 turns: A, B, A, B, A, B, A, B
-    for (let i = 0; i < 8; i++) {
-      recordTurn(3, 1)
-    }
+    for (let i = 0; i < 8; i++) recordNeutralTurn()
     expect(gameStore.state.phase).toBe('halftime')
   })
 
-  it('stores correct akat and papit values', () => {
+  it('playerThrowIndex resets to 0 at the start of each new turn', () => {
     freshGame()
-    recordTurn(7, 3)
-    const turn = gameStore.state.rounds[0]!.teamATurns[0]
-    expect(turn.akat).toBe(7)
-    expect(turn.papit).toBe(3)
+    recordNeutralTurn() // complete turn 0
+    expect(gameStore.state.playerThrowIndex).toBe(0)
+    recordPlayerThrow(0, 0) // start turn 1
+    expect(gameStore.state.playerThrowIndex).toBe(1)
   })
 })
 
 // ── Issue 5: field-cleared bonus ─────────────────────────────────────────────
 
-describe('recordTurn — field cleared', () => {
-  it('sets fieldClearedBanner when akat=0 and papit=0', () => {
+describe('recordPlayerThrow — field cleared', () => {
+  it('mid-turn clear on throw 1: sets banner and advances without throw 2', () => {
     freshGame()
-    recordTurn(0, 0) // turn 0: team A clears
+    recordPlayerThrow(40, 0) // throw 1: all 40 knocked out → field cleared
     expect(gameStore.state.fieldClearedBanner).not.toBeNull()
     expect(gameStore.state.fieldClearedBanner!.teamIndex).toBe(0)
+    // Skipped to next turn without needing throw 2
+    expect(gameStore.state.playerThrowIndex).toBe(0)
+    expect(gameStore.state.turnIndex).toBe(1)
+  })
+
+  it('mid-turn clear on throw 1 includes player-2 kartut in bonus', () => {
+    freshGame()
+    recordPlayerThrow(40, 0) // turn 1 of 4, throw 1 → 2 + 3*4 = 14
+    expect(gameStore.state.fieldClearedBanner!.bonus).toBe(14)
+  })
+
+  it('field clear on throw 2 sets banner and advances turn', () => {
+    freshGame()
+    recordPlayerThrow(0, 0) // throw 1: nothing (40 akat remain)
+    recordPlayerThrow(40, 0) // throw 2: clear
+    expect(gameStore.state.fieldClearedBanner).not.toBeNull()
+    expect(gameStore.state.playerThrowIndex).toBe(0)
+    expect(gameStore.state.turnIndex).toBe(1)
   })
 
   it('skips team A remaining turns after field cleared', () => {
     freshGame()
-    recordTurn(0, 0) // turn 0: A clears → turns 2, 4, 6 skipped
-    expect(gameStore.state.turnIndex).toBe(1) // next is team B turn 0
-    recordTurn(3, 1) // turn 1: B
+    recordClearingTurn() // turn 0: A clears → turns 2, 4, 6 skipped
+    expect(gameStore.state.turnIndex).toBe(1) // next is team B turn
+    recordNeutralTurn() // turn 1: B
     expect(gameStore.state.turnIndex).toBe(3) // turn 2 (A) skipped
-    recordTurn(2, 1) // turn 3: B
+    recordNeutralTurn() // turn 3: B
     expect(gameStore.state.turnIndex).toBe(5) // turn 4 (A) skipped
-    recordTurn(1, 0) // turn 5: B
+    recordNeutralTurn() // turn 5: B
     expect(gameStore.state.turnIndex).toBe(7) // turn 6 (A) skipped
-    recordTurn(4, 2) // turn 7: B → round complete
+    recordNeutralTurn() // turn 7: B → round complete
     expect(gameStore.state.phase).toBe('halftime')
   })
 
   it('round ends immediately when both teams have cleared', () => {
     freshGame()
-    recordTurn(0, 0) // turn 0: A clears
-    recordTurn(0, 0) // turn 1: B clears → both cleared, round over
+    recordClearingTurn() // turn 0: A clears
+    recordClearingTurn() // turn 1: B clears → both cleared, round over
     expect(gameStore.state.phase).toBe('halftime')
   })
 
   it('normal play unaffected when no field is cleared', () => {
     freshGame()
-    recordTurn(5, 1)
+    recordPlayerThrow(0, 0)
+    expect(gameStore.state.fieldClearedBanner).toBeNull()
+    recordPlayerThrow(0, 0)
     expect(gameStore.state.fieldClearedBanner).toBeNull()
   })
 })
 
-// ── Issue 6: editTurn ─────────────────────────────────────────────────────────
+// ── Issue 6 / Issue 14: editTurn ──────────────────────────────────────────────
 
 describe('editTurn', () => {
-  it('overwrites a stored turn', () => {
+  it('overwrites a stored turn with new throws', () => {
     freshGame()
-    recordTurn(5, 1) // turn 0: team A, teamTurnIndex 0
-    editTurn(0, 0, 0, 3, 2)
+    recordNeutralTurn() // turn 0: team A
+    // Edit: throw1={ko:0,pc:0}, throw2={ko:35,pc:2} → akat=40-35-2=3, papit=2
+    editTurn(0, 0, 0, { knockedOut: 0, pappiCount: 0 }, { knockedOut: 35, pappiCount: 2 })
     const turn = gameStore.state.rounds[0]!.teamATurns[0]
-    expect(turn.akat).toBe(3)
-    expect(turn.papit).toBe(2)
+    expect(turn.throws[0]).toEqual({ knockedOut: 0, pappiCount: 0 })
+    expect(turn.throws[1]).toEqual({ knockedOut: 35, pappiCount: 2 })
+    const akat = deriveAkat(Array.from(turn.throws))
+    expect(akat).toBe(3)
   })
 
   it('does not change phase or turnIndex', () => {
     freshGame()
-    recordTurn(5, 1)
+    recordNeutralTurn()
     const ti = gameStore.state.turnIndex
-    editTurn(0, 0, 0, 3, 2)
+    editTurn(0, 0, 0, { knockedOut: 0, pappiCount: 0 }, { knockedOut: 35, pappiCount: 2 })
     expect(gameStore.state.turnIndex).toBe(ti)
     expect(gameStore.state.phase).toBe('round')
   })
 
   it('recalculates cleared flag after edit removes field-clear', () => {
     freshGame()
-    recordTurn(0, 0) // A clears on turn 0
+    recordClearingTurn() // A clears on turn 0
     expect(gameStore.state.rounds[0]!.teamACleared).toBe(true)
-    editTurn(0, 0, 0, 5, 1) // change to non-zero
+    editTurn(0, 0, 0, { knockedOut: 0, pappiCount: 0 }, { knockedOut: 5, pappiCount: 1 })
     expect(gameStore.state.rounds[0]!.teamACleared).toBe(false)
   })
 
   it('recalculates scores correctly after edit', () => {
     freshGame()
-    for (let i = 0; i < 8; i++) recordTurn(5, 1) // all turns with 5+1
-    // Now in halftime. Edit team A turn 3 (teamTurnIndex=3) in round 0
-    editTurn(0, 0, 3, 2, 1)
+    for (let i = 0; i < 8; i++) recordNeutralTurn() // all neutral → halftime
+    // Edit team A turn 3 (teamTurnIndex=3): preceding 3 turns all {ko:0, pc:0}
+    // throw2={ko:37,pc:1} → akat=40-37-1=2, score=2*(-2)+1*(-1)=-5
+    editTurn(0, 0, 3, { knockedOut: 0, pappiCount: 0 }, { knockedOut: 37, pappiCount: 1 })
     const round = gameStore.state.rounds[0]!
     const score = getRoundScore(round, 0)
-    // scoreRound uses last turn: akat=2, papit=1 → 2*(-2)+1*(-1) = -5
-    expect(score).toBe(-5)
+    expect(score).toBe(-5) // 2*(-2)+1*(-1)
+  })
+
+  it('field clear on throw 1 truncates to single throw and sets cleared flag', () => {
+    freshGame()
+    recordNeutralTurn() // turn 0: A
+    editTurn(0, 0, 0, { knockedOut: 40, pappiCount: 0 }) // edit to clear on throw 1
+    const turn = gameStore.state.rounds[0]!.teamATurns[0]
+    expect(turn.throws).toHaveLength(1)
+    expect(turn.result.fieldCleared).toBe(true)
+    expect(gameStore.state.rounds[0]!.teamACleared).toBe(true)
+  })
+})
+
+// ── Issue 14: editPlayerThrow ─────────────────────────────────────────────────
+
+describe('editPlayerThrow', () => {
+  it('edits throw 2 and recomputes result', () => {
+    freshGame()
+    recordPlayerThrow(0, 0) // throw 1
+    recordPlayerThrow(0, 0) // throw 2
+    // Edit throw 2: ko=37, pc=1 → akat=40-37-1=2, score=-5
+    editPlayerThrow(0, 0, 0, 1, 37, 1)
+    const turn = gameStore.state.rounds[0]!.teamATurns[0]
+    expect(turn.throws[1]).toEqual({ knockedOut: 37, pappiCount: 1 })
+    expect(turn.result.points).toBe(-5) // 2*(-2)+1*(-1)
+  })
+
+  it('edits throw 1 without clearing: keeps throw 2 and recomputes', () => {
+    freshGame()
+    recordPlayerThrow(5, 0) // throw 1
+    recordPlayerThrow(3, 1) // throw 2
+    editPlayerThrow(0, 0, 0, 0, 10, 0) // change throw 1 to ko=10
+    const turn = gameStore.state.rounds[0]!.teamATurns[0]
+    expect(turn.throws[0]).toEqual({ knockedOut: 10, pappiCount: 0 })
+    expect(turn.throws).toHaveLength(2) // throw 2 preserved
+    // akat after throw2 = 40-10-3-1 = 26, score = 26*(-2)+1*(-1) = -53
+    expect(turn.result.points).toBe(26 * -2 + 1 * -1)
+  })
+
+  it('editing throw 1 to trigger field-clear discards throw 2', () => {
+    freshGame()
+    recordPlayerThrow(0, 0) // throw 1
+    recordPlayerThrow(0, 0) // throw 2
+    editPlayerThrow(0, 0, 0, 0, 40, 0) // edit throw 1 to clear field
+    const turn = gameStore.state.rounds[0]!.teamATurns[0]
+    expect(turn.throws).toHaveLength(1)
+    expect(turn.result.fieldCleared).toBe(true)
+    expect(gameStore.state.rounds[0]!.teamACleared).toBe(true)
+  })
+
+  it('does not change turnIndex or phase', () => {
+    freshGame()
+    recordNeutralTurn()
+    const ti = gameStore.state.turnIndex
+    editPlayerThrow(0, 0, 0, 1, 5, 0)
+    expect(gameStore.state.turnIndex).toBe(ti)
+    expect(gameStore.state.phase).toBe('round')
   })
 })
 
@@ -209,14 +318,14 @@ describe('editTurn', () => {
 describe('overrideRoundScore', () => {
   it('stores the override value for the team', () => {
     freshGame()
-    for (let i = 0; i < 4; i++) recordTurn(5, 1)
+    for (let i = 0; i < 4; i++) recordNeutralTurn()
     overrideRoundScore(0, -3)
     expect(gameStore.state.rounds[0]!.teamAOverride).toBe(-3)
   })
 
   it('override value is used in getRoundScore', () => {
     freshGame()
-    recordTurn(5, 1) // team A: would be -11
+    recordNeutralTurn() // team A: would be -80
     overrideRoundScore(0, 99)
     expect(getRoundScore(gameStore.state.rounds[0], 0)).toBe(99)
   })
@@ -233,7 +342,7 @@ describe('overrideRoundScore', () => {
 describe('confirmHalftime', () => {
   function reachHalftime() {
     freshGame()
-    for (let i = 0; i < 8; i++) recordTurn(3, 1)
+    for (let i = 0; i < 8; i++) recordNeutralTurn()
   }
 
   it('transitions from halftime to round', () => {
@@ -243,11 +352,12 @@ describe('confirmHalftime', () => {
     expect(gameStore.state.phase).toBe('round')
   })
 
-  it('sets roundIndex to 1 and turnIndex to 0', () => {
+  it('sets roundIndex to 1, turnIndex to 0, and playerThrowIndex to 0', () => {
     reachHalftime()
     confirmHalftime(['A', 'B'], ['C', 'D'])
     expect(gameStore.state.roundIndex).toBe(1)
     expect(gameStore.state.turnIndex).toBe(0)
+    expect(gameStore.state.playerThrowIndex).toBe(0)
   })
 
   it('updates player rosters', () => {
@@ -283,14 +393,14 @@ describe('full state machine: setup → round(0) → halftime → round(1) → f
     expect(gameStore.state.phase).toBe('round')
     expect(gameStore.state.roundIndex).toBe(0)
 
-    for (let i = 0; i < 8; i++) recordTurn(3, 1)
+    for (let i = 0; i < 8; i++) recordNeutralTurn()
     expect(gameStore.state.phase).toBe('halftime')
 
     confirmHalftime(['Alice', 'Bob', 'Carol', 'Dave'], ['Eve', 'Frank', 'Grace', 'Hank'])
     expect(gameStore.state.phase).toBe('round')
     expect(gameStore.state.roundIndex).toBe(1)
 
-    for (let i = 0; i < 8; i++) recordTurn(3, 1)
+    for (let i = 0; i < 8; i++) recordNeutralTurn()
     expect(gameStore.state.phase).toBe('finished')
 
     resetGame()
@@ -305,11 +415,12 @@ describe('full state machine: setup → round(0) → halftime → round(1) → f
 describe('resetGame', () => {
   it('resets all state to initial values', () => {
     freshGame()
-    recordTurn(5, 1)
+    recordNeutralTurn()
     resetGame()
     expect(gameStore.state.phase).toBe('setup')
     expect(gameStore.state.teams[0].name).toBe('')
     expect(gameStore.state.rounds[0]).toBeNull()
     expect(gameStore.state.turnIndex).toBe(0)
+    expect(gameStore.state.playerThrowIndex).toBe(0)
   })
 })
