@@ -18,13 +18,13 @@ An escape-hatch that lets the referee discard all recorded turns for a team's cu
 
 ## Acceptance criteria
 
-- [ ] Override button is visible but clearly secondary in the UI
-- [ ] Entering a valid integer and confirming updates the team's round score
-- [ ] Positive integers are accepted (field-cleared override scenario)
-- [ ] The scoreboard and game total reflect the overridden value immediately
-- [ ] An override indicator appears in the history panel
-- [ ] `RoundOverrideSchema` Vitest tests pass
-- [ ] Store `overrideRoundScore` tests verify the override value is used in score calculations
+- [x] Override button is visible but clearly secondary in the UI
+- [x] Entering a valid integer and confirming updates the team's round score
+- [x] Positive integers are accepted (field-cleared override scenario)
+- [x] The scoreboard and game total reflect the overridden value immediately
+- [x] An override indicator appears in the history panel
+- [x] `RoundOverrideSchema` Vitest tests pass
+- [x] Store `overrideRoundScore` tests verify the override value is used in score calculations
 
 ## Blocked by
 
