@@ -67,41 +67,41 @@ describe('GameSetupSchema — invalid inputs', () => {
 // ── TurnInputSchema ───────────────────────────────────────────────────────────
 
 describe('TurnInputSchema — valid inputs', () => {
-  it('accepts akkat=0, papit=0', () => {
-    expect(() => TurnInputSchema.parse({ akkat: 0, papit: 0 })).not.toThrow()
+  it('accepts akat=0, papit=0', () => {
+    expect(() => TurnInputSchema.parse({ akat: 0, papit: 0 })).not.toThrow()
   })
 
-  it('accepts akkat=20, papit=20', () => {
-    expect(() => TurnInputSchema.parse({ akkat: 20, papit: 20 })).not.toThrow()
+  it('accepts akat=20, papit=20', () => {
+    expect(() => TurnInputSchema.parse({ akat: 20, papit: 20 })).not.toThrow()
   })
 
-  it('accepts akkat=40, papit=0', () => {
-    expect(() => TurnInputSchema.parse({ akkat: 40, papit: 0 })).not.toThrow()
+  it('accepts akat=40, papit=0', () => {
+    expect(() => TurnInputSchema.parse({ akat: 40, papit: 0 })).not.toThrow()
   })
 
-  it('accepts akkat=0, papit=40', () => {
-    expect(() => TurnInputSchema.parse({ akkat: 0, papit: 40 })).not.toThrow()
+  it('accepts akat=0, papit=40', () => {
+    expect(() => TurnInputSchema.parse({ akat: 0, papit: 40 })).not.toThrow()
   })
 })
 
 describe('TurnInputSchema — invalid inputs', () => {
-  it('rejects akkat + papit > 40', () => {
-    const result = TurnInputSchema.safeParse({ akkat: 21, papit: 20 })
+  it('rejects akat + papit > 40', () => {
+    const result = TurnInputSchema.safeParse({ akat: 21, papit: 20 })
     expect(result.success).toBe(false)
   })
 
-  it('rejects negative akkat', () => {
-    const result = TurnInputSchema.safeParse({ akkat: -1, papit: 0 })
+  it('rejects negative akat', () => {
+    const result = TurnInputSchema.safeParse({ akat: -1, papit: 0 })
     expect(result.success).toBe(false)
   })
 
   it('rejects negative papit', () => {
-    const result = TurnInputSchema.safeParse({ akkat: 0, papit: -1 })
+    const result = TurnInputSchema.safeParse({ akat: 0, papit: -1 })
     expect(result.success).toBe(false)
   })
 
-  it('rejects akkat > 40', () => {
-    const result = TurnInputSchema.safeParse({ akkat: 41, papit: 0 })
+  it('rejects akat > 40', () => {
+    const result = TurnInputSchema.safeParse({ akat: 41, papit: 0 })
     expect(result.success).toBe(false)
   })
 })

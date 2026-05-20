@@ -116,11 +116,11 @@ describe('recordTurn — basic flow', () => {
     expect(gameStore.state.phase).toBe('halftime')
   })
 
-  it('stores correct akkat and papit values', () => {
+  it('stores correct akat and papit values', () => {
     freshGame()
     recordTurn(7, 3)
     const turn = gameStore.state.rounds[0]!.teamATurns[0]
-    expect(turn.akkat).toBe(7)
+    expect(turn.akat).toBe(7)
     expect(turn.papit).toBe(3)
   })
 })
@@ -128,7 +128,7 @@ describe('recordTurn — basic flow', () => {
 // ── Issue 5: field-cleared bonus ─────────────────────────────────────────────
 
 describe('recordTurn — field cleared', () => {
-  it('sets fieldClearedBanner when akkat=0 and papit=0', () => {
+  it('sets fieldClearedBanner when akat=0 and papit=0', () => {
     freshGame()
     recordTurn(0, 0) // turn 0: team A clears
     expect(gameStore.state.fieldClearedBanner).not.toBeNull()
@@ -171,7 +171,7 @@ describe('editTurn', () => {
     recordTurn(5, 1) // turn 0: team A, teamTurnIndex 0
     editTurn(0, 0, 0, 3, 2)
     const turn = gameStore.state.rounds[0]!.teamATurns[0]
-    expect(turn.akkat).toBe(3)
+    expect(turn.akat).toBe(3)
     expect(turn.papit).toBe(2)
   })
 
@@ -199,7 +199,7 @@ describe('editTurn', () => {
     editTurn(0, 0, 3, 2, 1)
     const round = gameStore.state.rounds[0]!
     const score = getRoundScore(round, 0)
-    // scoreRound uses last turn: akkat=2, papit=1 → 2*(-2)+1*(-1) = -5
+    // scoreRound uses last turn: akat=2, papit=1 → 2*(-2)+1*(-1) = -5
     expect(score).toBe(-5)
   })
 })

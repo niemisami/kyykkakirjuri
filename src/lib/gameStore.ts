@@ -13,7 +13,7 @@ export interface Team {
 }
 
 export interface TurnRecord {
-  akkat: number
+  akat: number
   papit: number
   result: TurnResult
 }
@@ -146,7 +146,7 @@ export function startGame(
 }
 
 /** Issue 4+5: Record a turn, detect field-cleared, advance turn index. */
-export function recordTurn(akkat: number, papit: number) {
+export function recordTurn(akat: number, papit: number) {
   gameStore.setState((state) => {
     const { roundIndex, turnIndex, rounds, teams } = state
     const round = rounds[roundIndex] ?? emptyRound()
@@ -155,8 +155,8 @@ export function recordTurn(akkat: number, papit: number) {
     const teamTurnIndex = getTeamTurnIndex(turnIndex)
 
     // scoreTurn uses 1-based turnIndex
-    const result = scoreTurn(akkat, papit, teamTurnIndex + 1, TURNS_PER_ROUND)
-    const record: TurnRecord = { akkat, papit, result }
+    const result = scoreTurn(akat, papit, teamTurnIndex + 1, TURNS_PER_ROUND)
+    const record: TurnRecord = { akat, papit, result }
 
     const newRound: RoundData = { ...round }
     if (activeTeamIndex === 0) {
@@ -212,15 +212,15 @@ export function editTurn(
   roundIdx: 0 | 1,
   teamIndex: 0 | 1,
   teamTurnIndex: number,
-  akkat: number,
+  akat: number,
   papit: number,
 ) {
   gameStore.setState((state) => {
     const round = state.rounds[roundIdx]
     if (!round) return state
 
-    const result = scoreTurn(akkat, papit, teamTurnIndex + 1, TURNS_PER_ROUND)
-    const record: TurnRecord = { akkat, papit, result }
+    const result = scoreTurn(akat, papit, teamTurnIndex + 1, TURNS_PER_ROUND)
+    const record: TurnRecord = { akat, papit, result }
 
     const newRound: RoundData = { ...round }
     if (teamIndex === 0) {

@@ -79,7 +79,7 @@ export function ResultsStep({ state }: ResultsStepProps) {
                           <span>
                             {turn.result.fieldCleared
                               ? `+${turn.result.unusedKartut}`
-                              : `A:${turn.akkat} P:${turn.papit}`}
+                              : `A:${turn.akat} P:${turn.papit}`}
                           </span>
                         </div>
                       ))}

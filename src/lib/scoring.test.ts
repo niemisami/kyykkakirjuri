@@ -10,26 +10,26 @@ import {
 } from './scoring'
 
 describe('scoreTurn — normal scoring', () => {
-  it('multiplies akkat and papit by correct weights and sums them', () => {
+  it('multiplies akat and papit by correct weights and sums them', () => {
     const result = scoreTurn(3, 1, 4, TURNS_PER_ROUND)
     expect(result.points).toBe(3 * AKKA_POINTS + 1 * PAPPI_POINTS) // -7
     expect(result.fieldCleared).toBe(false)
     expect(result.unusedKartut).toBe(0)
   })
 
-  it('edge case: 40 akkat, 0 papit', () => {
+  it('edge case: 40 akat, 0 papit', () => {
     const result = scoreTurn(40, 0, 4, TURNS_PER_ROUND)
     expect(result.points).toBe(40 * AKKA_POINTS) // -80
     expect(result.fieldCleared).toBe(false)
   })
 
-  it('edge case: 0 akkat, 40 papit', () => {
+  it('edge case: 0 akat, 40 papit', () => {
     const result = scoreTurn(0, 40, 4, TURNS_PER_ROUND)
     expect(result.points).toBe(40 * PAPPI_POINTS) // -40
     expect(result.fieldCleared).toBe(false)
   })
 
-  it('edge case: 20 akkat, 20 papit', () => {
+  it('edge case: 20 akat, 20 papit', () => {
     const result = scoreTurn(20, 20, 4, TURNS_PER_ROUND)
     expect(result.points).toBe(20 * AKKA_POINTS + 20 * PAPPI_POINTS) // -60
     expect(result.fieldCleared).toBe(false)
@@ -63,7 +63,7 @@ describe('scoreTurn — field cleared', () => {
     expect(result.fieldCleared).toBe(false)
   })
 
-  it('non-zero akkat alone is not a field clear', () => {
+  it('non-zero akat alone is not a field clear', () => {
     const result = scoreTurn(1, 0, 2, TURNS_PER_ROUND)
     expect(result.fieldCleared).toBe(false)
   })

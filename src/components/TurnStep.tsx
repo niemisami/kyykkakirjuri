@@ -143,10 +143,10 @@ function RecordForm({
   teamTurnIndex: number
 }) {
   const form = useForm({
-    defaultValues: { akkat: 0, papit: 0 },
+    defaultValues: { akat: 0, papit: 0 },
     validators: { onSubmit: TurnInputSchema },
     onSubmit: ({ value }) => {
-      recordTurn(value.akkat, value.papit)
+      recordTurn(value.akat, value.papit)
       form.reset()
     },
   })
@@ -169,7 +169,7 @@ function RecordForm({
         className="space-y-4"
       >
         <div className="grid grid-cols-2 gap-4">
-          <form.Field name="akkat">
+          <form.Field name="akat">
             {(field) => (
               <NumberStepper
                 label="Akat"
@@ -192,10 +192,10 @@ function RecordForm({
           </form.Field>
         </div>
 
-        <form.Subscribe selector={(s) => [s.values.akkat, s.values.papit] as const}>
-          {([akkat, papit]) => (
+        <form.Subscribe selector={(s) => [s.values.akat, s.values.papit] as const}>
+          {([akat, papit]) => (
             <p className="text-center text-sm text-muted-foreground">
-              Tyhjennetty: {Math.max(0, 40 - akkat - papit)} kyykkää
+              Tyhjennetty: {Math.max(0, akat + papit)} kyykkää
             </p>
           )}
         </form.Subscribe>
@@ -229,12 +229,12 @@ function EditForm({
 }) {
   const form = useForm({
     defaultValues: {
-      akkat: existing?.akkat ?? 0,
+      akat: existing?.akat ?? 0,
       papit: existing?.papit ?? 0,
     },
     validators: { onSubmit: TurnInputSchema },
     onSubmit: ({ value }) => {
-      editTurn(roundIdx, teamIndex, teamTurnIndex, value.akkat, value.papit)
+      editTurn(roundIdx, teamIndex, teamTurnIndex, value.akat, value.papit)
       onSave()
     },
   })
@@ -259,7 +259,7 @@ function EditForm({
         className="space-y-4"
       >
         <div className="grid grid-cols-2 gap-4">
-          <form.Field name="akkat">
+          <form.Field name="akat">
             {(field) => (
               <NumberStepper
                 label="Akat"
@@ -432,7 +432,7 @@ function HistoryPanel({
                       Kenttä tyhjä! +{turn.result.unusedKartut}
                     </span>
                   ) : (
-                    `A: ${turn.akkat} · P: ${turn.papit} (${turn.result.points}p)`
+                    `A: ${turn.akat} · P: ${turn.papit} (${turn.result.points}p)`
                   )}
                 </span>
                 <Button

@@ -25,7 +25,7 @@ export type GameSetupInput = z.infer<typeof GameSetupSchema>
 
 export const TurnInputSchema = z
   .object({
-    akkat: z
+    akat: z
       .number()
       .int()
       .min(0, 'Akat ei voi olla negatiivinen')
@@ -36,9 +36,9 @@ export const TurnInputSchema = z
       .min(0, 'Papit ei voi olla negatiivinen')
       .max(40, 'Pappi-arvo liian suuri'),
   })
-  .refine((v) => v.akkat + v.papit <= 40, {
+  .refine((v) => v.akat + v.papit <= 40, {
     message: 'Akat ja papit yhteensä enintään 40',
-    path: ['akkat'],
+    path: ['akat'],
   })
 
 export type TurnInput = z.infer<typeof TurnInputSchema>

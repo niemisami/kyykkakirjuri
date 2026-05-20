@@ -22,24 +22,24 @@ export interface GameResult {
 
 /**
  * Scores a single heittovuoro.
- * @param akkat   Kyykät remaining inside the target square
+ * @param akat   Kyykät remaining inside the target square
  * @param papit   Kyykät resting on the boundary line
  * @param turnIndex   1-based index of the current turn within the round
  * @param totalTurns  Total turns in the round (normally TURNS_PER_ROUND = 4)
  */
 export function scoreTurn(
-  akkat: number,
+  akat: number,
   papit: number,
   turnIndex: number,
   totalTurns: number,
 ): TurnResult {
-  const fieldCleared = akkat === 0 && papit === 0
+  const fieldCleared = akat === 0 && papit === 0
   if (fieldCleared) {
     const unusedKartut = (totalTurns - turnIndex) * KARTUT_PER_TURN
     return { points: unusedKartut, fieldCleared: true, unusedKartut }
   }
   return {
-    points: akkat * AKKA_POINTS + papit * PAPPI_POINTS,
+    points: akat * AKKA_POINTS + papit * PAPPI_POINTS,
     fieldCleared: false,
     unusedKartut: 0,
   }
