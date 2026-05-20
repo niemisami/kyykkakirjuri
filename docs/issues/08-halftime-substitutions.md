@@ -18,13 +18,13 @@ The halftime screen shown automatically after round 1 completes. The referee see
 
 ## Acceptance criteria
 
-- [ ] Halftime screen appears automatically after the 8th turn of round 1
-- [ ] Round 1 scores for both teams are displayed in Finnish
-- [ ] Side-swap is clearly communicated in the UI
-- [ ] Referee can edit player names and reorder playing order per team
-- [ ] Confirming without changes works (substitutions are optional)
-- [ ] After confirming, round 2 turns start with correct team and player state
-- [ ] Store `confirmHalftime` Vitest tests verify the transition and roster update
+- [x] Halftime screen appears automatically after the 8th turn of round 1
+- [x] Round 1 scores for both teams are displayed in Finnish
+- [x] Side-swap is clearly communicated in the UI
+- [x] Referee can edit player names and reorder playing order per team
+- [x] Confirming without changes works (substitutions are optional)
+- [x] After confirming, round 2 turns start with correct team and player state
+- [x] Store `confirmHalftime` Vitest tests verify the transition and roster update
 
 ## Blocked by
 
