@@ -1,14 +1,25 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useGameStore } from '@/lib/useGameStore'
+import { SetupStep } from '@/components/SetupStep'
+import { TurnStep } from '@/components/TurnStep'
+import { HalftimeStep } from '@/components/HalftimeStep'
+import { ResultsStep } from '@/components/ResultsStep'
 
 export const Route = createFileRoute('/')({
   component: IndexPage,
 })
 
 function IndexPage() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      <h1 className="text-3xl font-bold tracking-tight">Kyykkakirjuri</h1>
-      <p className="mt-2 text-muted-foreground">Pistelaskuri kyykkäpeleille</p>
-    </main>
-  )
+  const state = useGameStore()
+
+  switch (state.phase) {
+    case 'setup':
+      return <SetupStep />
+    case 'round':
+      return <TurnStep state={state} />
+    case 'halftime':
+      return <HalftimeStep state={state} />
+    case 'finished':
+      return <ResultsStep state={state} />
+  }
 }

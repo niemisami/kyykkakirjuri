@@ -19,15 +19,15 @@ Mobile-friendly layout: large touch targets, no horizontal scrolling.
 
 ## Acceptance criteria
 
-- [ ] Referee can enter two team names
-- [ ] Referee can add 1–4 players per team
-- [ ] Validation prevents submission with empty team names or zero players
-- [ ] Inline validation errors display in Finnish
-- [ ] Confirming valid setup transitions to the turn recording step
-- [ ] Player pairing module returns correct pairs for all team sizes (1–4) and all turn indices (0–3)
-- [ ] Player pairing Vitest tests pass
-- [ ] `GameSetupSchema` Vitest tests pass (valid and invalid inputs)
-- [ ] Store transitions correctly from `setup` → `round` on `startGame`
+- [x] Referee can enter two team names
+- [x] Referee can add 1–4 players per team
+- [x] Validation prevents submission with empty team names or zero players
+- [x] Inline validation errors display in Finnish
+- [x] Confirming valid setup transitions to the turn recording step
+- [x] Player pairing module returns correct pairs for all team sizes (1–4) and all turn indices (0–3)
+- [x] Player pairing Vitest tests pass
+- [x] `GameSetupSchema` Vitest tests pass (valid and invalid inputs)
+- [x] Store transitions correctly from `setup` → `round` on `startGame`
 
 ## Blocked by
 
