@@ -1,6 +1,5 @@
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
-import { Button } from '@/components/ui/button'
 import { startGame } from '@/lib/gameStore'
 
 const PLAYER_COUNT = 4
@@ -41,9 +40,9 @@ export function SetupStep() {
   })
 
   return (
-    <main className="mx-auto max-w-lg px-4 py-8 space-y-8">
+    <main className="mx-auto max-w-[600px] px-4 pt-20 pb-8 space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Kyykkakirjuri</h1>
+        <h1 className="text-headline-lg font-black tracking-tight">Kyykkakirjuri</h1>
         <p className="mt-1 text-muted-foreground">Syötä joukkueet ja pelaajat</p>
       </div>
 
@@ -53,17 +52,17 @@ export function SetupStep() {
           e.stopPropagation()
           form.handleSubmit()
         }}
-        className="space-y-8"
+        className="space-y-6"
       >
         {(['teamA', 'teamB'] as const).map((teamKey, idx) => (
-          <section key={teamKey} className="space-y-4 rounded-xl border p-4">
-            <h2 className="text-lg font-semibold">Joukkue {idx === 0 ? 'A' : 'B'}</h2>
+          <section key={teamKey} className="glass-panel rounded-[2rem] p-8 space-y-5 shadow-md">
+            <h2 className="text-headline-md">Joukkue {idx === 0 ? 'A' : 'B'}</h2>
 
             {/* Team name */}
             <form.Field name={`${teamKey}.name`}>
               {(field) => (
                 <div>
-                  <label htmlFor={field.name} className="block text-sm font-medium mb-1">
+                  <label htmlFor={field.name} className="text-label-caps text-muted-foreground block mb-2">
                     Joukkueen nimi
                   </label>
                   <input
@@ -72,7 +71,7 @@ export function SetupStep() {
                     onChange={(e) => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
                     placeholder="Joukkueen nimi"
-                    className="w-full rounded-lg border px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full rounded-xl border-2 border-border bg-white/70 px-4 py-3 text-base focus:outline-none focus:border-primary transition-colors"
                   />
                   {field.state.meta.errors.length > 0 && (
                     <p className="mt-1 text-sm text-destructive">
@@ -86,8 +85,8 @@ export function SetupStep() {
             {/* Players */}
             <form.Field name={`${teamKey}.players`} mode="array">
               {(playersField) => (
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium">Pelaajat</label>
+                <div className="space-y-3">
+                  <label className="text-label-caps text-muted-foreground block">Pelaajat</label>
 
                   {playersField.state.value.map((_, i) => (
                     <form.Field key={i} name={`${teamKey}.players[${i}].name`}>
@@ -98,7 +97,7 @@ export function SetupStep() {
                             onChange={(e) => subField.handleChange(e.target.value)}
                             onBlur={subField.handleBlur}
                             placeholder={`Pelaaja ${i + 1}`}
-                            className="w-full rounded-lg border px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-ring"
+                            className="w-full rounded-xl border-2 border-border bg-white/70 px-4 py-3 text-base focus:outline-none focus:border-primary transition-colors"
                           />
                           {subField.state.meta.errors.length > 0 && (
                             <p className="text-sm text-destructive">
@@ -115,9 +114,12 @@ export function SetupStep() {
           </section>
         ))}
 
-        <Button type="submit" size="lg" className="w-full">
+        <button
+          type="submit"
+          className="w-full h-12 bg-primary-container text-primary-container-foreground rounded-xl font-bold text-body-lg active:scale-95 transition-all shadow-lg"
+        >
           Aloita peli
-        </Button>
+        </button>
       </form>
     </main>
   )
