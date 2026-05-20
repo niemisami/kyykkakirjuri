@@ -36,14 +36,14 @@ Exhaustive Vitest unit tests covering:
 
 ## Acceptance criteria
 
-- [ ] `scoreTurn` returns correct points for normal scoring
-- [ ] `scoreTurn` detects field cleared and returns correct `unusedKartut`
-- [ ] `scoreRound` applies field-cleared logic at the correct turn
-- [ ] `scoreRound` returns the manual override value when one is set
-- [ ] `scoreGame` sums both rounds per team and identifies the winner
-- [ ] `scoreGame` returns `'tie'` when totals are equal
-- [ ] All Vitest tests pass with `pnpm test`
-- [ ] Module has zero imports from React, @tanstack/store, or any UI layer
+- [x] `scoreTurn` returns correct points for normal scoring
+- [x] `scoreTurn` detects field cleared and returns correct `unusedKartut`
+- [x] `scoreRound` applies field-cleared logic at the correct turn
+- [x] `scoreRound` returns the manual override value when one is set
+- [x] `scoreGame` sums both rounds per team and identifies the winner
+- [x] `scoreGame` returns `'tie'` when totals are equal
+- [x] All Vitest tests pass with `pnpm test`
+- [x] Module has zero imports from React, @tanstack/store, or any UI layer
 
 ## Blocked by
 
