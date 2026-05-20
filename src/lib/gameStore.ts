@@ -1,6 +1,7 @@
 import { Store } from '@tanstack/store'
 import { scoreTurn, scoreRound, TURNS_PER_ROUND } from './scoring'
 import type { TurnResult } from './scoring'
+import { typedStorage, v1Key } from './storage/storageHelpers'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -45,6 +46,8 @@ export interface GameState {
 
 // ── Initial state ─────────────────────────────────────────────────────────────
 
+const STORAGE_KEY = 'game-state'
+
 const initialState: GameState = {
   phase: 'setup',
   teams: [
@@ -57,7 +60,10 @@ const initialState: GameState = {
   fieldClearedBanner: null,
 }
 
-export const gameStore = new Store<GameState>({ ...initialState })
+const gameStateStorage = typedStorage<GameState>(localStorage, v1Key(STORAGE_KEY), initialState)
+
+export const gameStore = new Store<GameState>(gameStateStorage.getData())
+gameStore.subscribe(() => gameStateStorage.persistData(gameStore.state))
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
