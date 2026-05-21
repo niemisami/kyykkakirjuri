@@ -11,8 +11,8 @@ import {
     type DragEndEvent,
     type DragStartEvent
 } from '@dnd-kit/core';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
-    arrayMove,
     SortableContext,
     sortableKeyboardCoordinates,
     useSortable,
@@ -120,7 +120,7 @@ function SortablePlayerRow({
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       {...attributes}
-      className={isDragging ? 'bg-red-600' : undefined}
+      className={isDragging ? 'invisible' : undefined}
     >
       <PlayerRowContent
         index={index}
@@ -170,7 +170,7 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
       }}
       className="space-y-6"
     >
-      {(['teamA'] as const).map((teamKey, idx) => (
+      {(['teamA', 'teamB'] as const).map((teamKey, idx) => (
         <form.Field key={teamKey} name={`${teamKey}.players`} mode="array">
           {(playersField) => {
             const itemIds = playersField.state.value.map((item, i) => `${teamKey}-${item.name}-${i}`)
@@ -198,7 +198,7 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
-                // modifiers={[restrictToVerticalAxis]}
+                modifiers={[restrictToVerticalAxis]}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
               >
@@ -244,6 +244,7 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
 
                 <DragOverlay>
                   {activeId && activeIndex !== -1 ? (
+                    <div className='bg-white rounded-full'>
                     <PlayerRowContent
                       index={activeIndex}
                       value={playersField.state.value[activeIndex]?.name ?? ''}
@@ -253,7 +254,9 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
                       onClear={() => {}}
                       isOverlay
                     />
+                    </div>
                   ) : null}
+
                 </DragOverlay>
               </DndContext>
             )
