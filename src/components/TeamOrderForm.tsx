@@ -1,28 +1,28 @@
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
+import { confirmHalftime, type Team } from '@/lib/gameStore';
 import {
-  DndContext,
-  DragOverlay,
-  type DragEndEvent,
-  type DragStartEvent,
-  KeyboardSensor,
-  PointerSensor,
-  TouchSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core'
+    closestCenter,
+    DndContext,
+    DragOverlay,
+    KeyboardSensor,
+    PointerSensor,
+    TouchSensor,
+    useSensor,
+    useSensors,
+    type DragEndEvent,
+    type DragStartEvent
+} from '@dnd-kit/core';
 import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { useState } from 'react'
-import { useForm } from '@tanstack/react-form'
-import { GripVertical, X } from 'lucide-react'
-import { z } from 'zod'
-import { confirmHalftime, type Team } from '@/lib/gameStore'
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    useSortable,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { useForm } from '@tanstack/react-form';
+import { GripVertical, X } from 'lucide-react';
+import { useState } from 'react';
+import { z } from 'zod';
 
 const HalftimeFormSchema = z.object({
   teamA: z.object({
@@ -56,22 +56,20 @@ function PlayerRowContent({
   onBlur,
   errors,
   onClear,
-  dragHandleProps,
   isOverlay,
+  dndHandlerListeners,
 }: Omit<SortablePlayerRowProps, 'id'> & {
-  dragHandleProps?: { ref?: React.Ref<HTMLButtonElement>; attributes: object; listeners: object }
   isOverlay?: boolean
+  dndHandlerListeners?: ReturnType<typeof useSortable>['listeners']
 }) {
   return (
     <div className={`space-y-1 ${isOverlay ? 'shadow-2xl rounded-xl' : ''}`}>
       <div className="flex gap-2 items-center">
         <button
-          ref={dragHandleProps?.ref as React.Ref<HTMLButtonElement>}
+          {...dndHandlerListeners}
           type="button"
           aria-label="Järjestä vetämällä"
           className="touch-none p-1 text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing transition-colors"
-          {...(dragHandleProps?.attributes ?? {})}
-          {...(dragHandleProps?.listeners ?? {})}
         >
           <GripVertical size={18} />
         </button>
@@ -113,17 +111,16 @@ function SortablePlayerRow({
     attributes,
     listeners,
     setNodeRef,
-    setActivatorNodeRef,
     transform,
     transition,
     isDragging,
   } = useSortable({ id })
-
   return (
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={isDragging ? 'invisible' : undefined}
+      {...attributes}
+      className={isDragging ? 'bg-red-600' : undefined}
     >
       <PlayerRowContent
         index={index}
@@ -132,7 +129,7 @@ function SortablePlayerRow({
         onBlur={onBlur}
         errors={errors}
         onClear={onClear}
-        dragHandleProps={{ ref: setActivatorNodeRef, attributes, listeners }}
+        dndHandlerListeners={listeners}
       />
     </div>
   )
@@ -173,10 +170,10 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
       }}
       className="space-y-6"
     >
-      {(['teamA', 'teamB'] as const).map((teamKey, idx) => (
+      {(['teamA'] as const).map((teamKey, idx) => (
         <form.Field key={teamKey} name={`${teamKey}.players`} mode="array">
           {(playersField) => {
-            const itemIds = playersField.state.value.map((_, i) => `${teamKey}-${i}`)
+            const itemIds = playersField.state.value.map((item, i) => `${teamKey}-${item.name}-${i}`)
             const activeIndex = activeId ? itemIds.indexOf(activeId) : -1
 
             function handleDragStart(event: DragStartEvent) {
@@ -185,13 +182,13 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
 
             function handleDragEnd(event: DragEndEvent) {
               const { active, over } = event
-              setActiveId(null)
               if (!over || active.id === over.id) return
               const oldIndex = itemIds.indexOf(active.id as string)
               const newIndex = itemIds.indexOf(over.id as string)
               if (oldIndex !== -1 && newIndex !== -1) {
                 playersField.moveValue(oldIndex, newIndex)
               }
+              setActiveId(null)
             }
 
             return (
@@ -201,7 +198,7 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
-                modifiers={[restrictToVerticalAxis]}
+                // modifiers={[restrictToVerticalAxis]}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
               >
@@ -211,7 +208,7 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
 
                   <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
                     <div className="space-y-3">
-                      {playersField.state.value.map((_, i) => (
+                      {playersField.state.value.map((_, i) =>(
                         <form.Field key={itemIds[i]} name={`${teamKey}.players[${i}].name`}>
                           {(subField) => (
                             <SortablePlayerRow
