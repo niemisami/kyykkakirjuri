@@ -10,33 +10,43 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PrototypeSortableListRouteImport } from './routes/prototype.sortable-list'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrototypeSortableListRoute = PrototypeSortableListRouteImport.update({
+  id: '/prototype/sortable-list',
+  path: '/prototype/sortable-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/prototype/sortable-list': typeof PrototypeSortableListRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/prototype/sortable-list': typeof PrototypeSortableListRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/prototype/sortable-list': typeof PrototypeSortableListRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/prototype/sortable-list'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/prototype/sortable-list'
+  id: '__root__' | '/' | '/prototype/sortable-list'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PrototypeSortableListRoute: typeof PrototypeSortableListRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +58,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/prototype/sortable-list': {
+      id: '/prototype/sortable-list'
+      path: '/prototype/sortable-list'
+      fullPath: '/prototype/sortable-list'
+      preLoaderRoute: typeof PrototypeSortableListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PrototypeSortableListRoute: PrototypeSortableListRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
