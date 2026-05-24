@@ -14,6 +14,7 @@ const globalForDb = globalThis as unknown as {
 
 const conn = globalForDb.conn ?? postgres(env.DATABASE_URL, {
   max: 10,
+  // Disable prepared statements for compatibility with pooled connections.
   prepare: false,
 })
 
@@ -21,4 +22,8 @@ if (env.NODE_ENV !== 'production') {
   globalForDb.conn = conn
 }
 
-export const db = drizzle(conn, { schema: schemas, logger: false })
+export const db = drizzle(conn, {
+  schema: schemas,
+  // Keep query logging off by default to avoid noisy output.
+  logger: false,
+})

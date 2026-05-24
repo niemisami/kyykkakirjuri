@@ -3,6 +3,9 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core'
 
+/**
+ * Common timestamp columns for created/updated tracking.
+ */
 export const dateColumns = () => ({
   createdAt: timestamp('created_at', { withTimezone: true })
     .$default(() => new Date())
@@ -13,6 +16,10 @@ export const dateColumns = () => ({
     .notNull(),
 })
 
+/**
+ * Common integer primary key + timestamp columns.
+ * Use only for tables that should use an auto-incrementing integer ID.
+ */
 export const baseColumns = () => ({
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   ...dateColumns(),
