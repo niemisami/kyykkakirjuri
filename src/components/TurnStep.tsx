@@ -197,7 +197,7 @@ function RecordForm({
           <form.Field name='knockedOut'>
             {field => (
               <NumberStepper
-                label='Poistetut'
+                label='Poistot'
                 value={field.state.value}
                 onChange={field.handleChange}
                 field={field}
@@ -321,7 +321,7 @@ function EditForm({
           <form.Field name='knockedOut'>
             {field => (
               <NumberStepper
-                label='Poistetut'
+                label='Poistot'
                 value={field.state.value}
                 onChange={field.handleChange}
                 field={field}
@@ -349,7 +349,7 @@ function EditForm({
               <form.Field name='knockedOut2'>
                 {field => (
                   <NumberStepper
-                    label='Poistetut'
+                    label='Poistot'
                     value={field.state.value}
                     onChange={field.handleChange}
                     field={field}
@@ -550,7 +550,7 @@ function HistoryPanel({
                     className='flex items-center justify-between text-xs text-muted-foreground pl-2'
                   >
                     <span>
-                      H{throwIdx + 1}: poistetut {thr.knockedOut} · papit {thr.pappiCount}
+                      H{throwIdx + 1}: poistot {thr.knockedOut} · papit {thr.pappiCount}
                     </span>
                     <Button
                       type='button'

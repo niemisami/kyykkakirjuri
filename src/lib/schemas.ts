@@ -45,8 +45,8 @@ export const PlayerThrowInputSchema = z
     knockedOut: z
       .number()
       .int()
-      .min(0, 'Poistetut ei voi olla negatiivinen')
-      .max(40, 'Poistetut-arvo liian suuri'),
+      .min(0, 'Poistot ei voi olla negatiivinen')
+      .max(40, 'Poistot-arvo liian suuri'),
     pappiCount: z
       .number()
       .int()
@@ -54,7 +54,7 @@ export const PlayerThrowInputSchema = z
       .max(40, 'Pappi-arvo liian suuri'),
   })
   .refine(v => v.knockedOut + v.pappiCount <= 40, {
-    message: 'Poistetut ja papit yhteensä enintään 40',
+    message: 'Poistot ja papit yhteensä enintään 40',
     path: ['knockedOut'],
   })
 

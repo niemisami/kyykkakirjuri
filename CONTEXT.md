@@ -51,7 +51,7 @@ Finnish: Pelaajan heittovuoro
 
 **Knocked out (poistettu)**:
 A kyykkä that has left the game square entirely during a player throw, whether it was previously inside (akka) or on the boundary (pappi). Recorded per throw as `knockedOut` — a delta of how many exited during this specific throw, not a running total. The cumulative sum across all player throws in a round, combined with the current `pappiCount`, gives: `akat = 40 − ΣknockedOut − pappiCount`.
-Finnish singular: poistettu. Finnish plural / UI label: Poistetut.
+Finnish singular: poistettu. Finnish plural / UI label: Poistot.
 _Avoid_: cleared (use "field cleared" only for the scoring event), removed
 
 **Opening turn**:
