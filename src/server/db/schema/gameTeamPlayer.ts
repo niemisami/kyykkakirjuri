@@ -1,15 +1,14 @@
 import { integer, pgTable, varchar } from 'drizzle-orm/pg-core'
 
-import { dateColumns } from '../schemaHelpers'
 import { game } from './game'
 import { player } from './player'
 import { team } from './team'
+import { baseColumns } from '../schemaHelpers'
 
 export const gameTeamPlayer = pgTable('game_team_player', {
-  gameTeamPlayerId: integer('game_team_player_id').primaryKey().generatedAlwaysAsIdentity(),
-  teamId: integer('team_id').notNull().references(() => team.teamId),
-  gameId: integer('game_id').notNull().references(() => game.gameId),
-  playerId: integer('player_id').notNull().references(() => player.playerId),
+  ...baseColumns('game_team_player_id'),
+  teamId: integer('team_id').notNull().references(() => team.id),
+  gameId: integer('game_id').notNull().references(() => game.id),
+  playerId: integer('player_id').notNull().references(() => player.id),
   name: varchar('name', { length: 255 }).notNull(),
-  ...dateColumns(),
 })

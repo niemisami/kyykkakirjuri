@@ -20,7 +20,7 @@ export const dateColumns = () => ({
  * Common integer primary key + timestamp columns.
  * Use only for tables that should use an auto-incrementing integer ID.
  */
-export const baseColumns = () => ({
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+export const baseColumns = (columnName: string) => ({
+  id: integer(columnName).primaryKey().generatedAlwaysAsIdentity(),
   ...dateColumns(),
 })
