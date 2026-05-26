@@ -88,6 +88,9 @@ describe('TurnInputSchema — valid inputs', () => {
   it('accepts akat=0, papit=40', () => {
     expect(() => TurnInputSchema.parse({ akat: 0, papit: 40 })).not.toThrow()
   })
+  it('accept akat=0, papit=-1', () => {
+    expect(() => TurnInputSchema.parse({ akat: 0, papit: -1 })).not.toThrow()
+  })
 })
 
 describe('TurnInputSchema — invalid inputs', () => {
@@ -98,11 +101,6 @@ describe('TurnInputSchema — invalid inputs', () => {
 
   it('rejects negative akat', () => {
     const result = TurnInputSchema.safeParse({ akat: -1, papit: 0 })
-    expect(result.success).toBe(false)
-  })
-
-  it('rejects negative papit', () => {
-    const result = TurnInputSchema.safeParse({ akat: 0, papit: -1 })
     expect(result.success).toBe(false)
   })
 

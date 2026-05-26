@@ -204,7 +204,6 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
                 onDragEnd={handleDragEnd}
               >
                 <section className='glass-panel rounded-[2rem] p-8 space-y-5 shadow-md'>
-                  {/* TODO replace char – with ─ */}
                   <h2 className='text-headline-md'>{teams[idx].name} - pelaajat erässä 2</h2>
 
                   <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>

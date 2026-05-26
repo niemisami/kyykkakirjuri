@@ -35,9 +35,8 @@ export interface PlayerThrowRecord {
  */
 export function deriveAkat(throwHistory: PlayerThrowRecord[]): number {
   const totalKnockedOut = throwHistory.reduce((sum, t) => sum + t.knockedOut, 0)
-  const lastPappiCount =
-    throwHistory.length > 0 ? throwHistory[throwHistory.length - 1].pappiCount : 0
-  return 40 - totalKnockedOut - lastPappiCount
+  const papit = throwHistory.reduce((sum, t) => sum + t.pappiCount, 0)
+  return 40 - totalKnockedOut - papit
 }
 
 export const PlayerThrowInputSchema = z
@@ -50,7 +49,7 @@ export const PlayerThrowInputSchema = z
     pappiCount: z
       .number()
       .int()
-      .min(0, 'Papit ei voi olla negatiivinen')
+      .min(-40, 'Papit ei voi olla alle -40')
       .max(40, 'Pappi-arvo liian suuri'),
   })
   .refine(v => v.knockedOut + v.pappiCount <= 40, {
@@ -72,7 +71,7 @@ export const TurnInputSchema = z
     papit: z
       .number()
       .int()
-      .min(0, 'Papit ei voi olla negatiivinen')
+      .min(-40, 'Papit ei voi olla alle -40')
       .max(40, 'Pappi-arvo liian suuri'),
   })
   .refine(v => v.akat + v.papit <= 40, {

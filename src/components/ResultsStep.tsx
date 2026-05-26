@@ -2,7 +2,7 @@ import { resetGame, getRoundScore } from '@/lib/gameStore'
 import type { GameState } from '@/lib/gameStore'
 import { scoreGame } from '@/lib/scoring'
 import { deriveAkat } from '@/lib/schemas'
-import type { PlayerThrowRecord } from '@/lib/schemas'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 interface ResultsStepProps {
   state: GameState
@@ -28,9 +28,9 @@ export function ResultsStep({ state }: ResultsStepProps) {
         : `${teams[1].name} voittaa!`
 
   return (
-    <div className='mx-auto max-w-[600px] px-4 pt-20 pb-8 space-y-6'>
+    <div className='mx-auto max-w-150 px-4 pt-20 pb-8 space-y-6'>
       <div className='text-center'>
-        <h1 className='text-headline-lg font-black'>Peli valmis</h1>
+        <h1 className='text-headline-lg font-black'>Peli ohi</h1>
         <p className='text-body-lg font-semibold mt-2 text-primary'>{winnerText}</p>
       </div>
 
@@ -62,54 +62,75 @@ export function ResultsStep({ state }: ResultsStepProps) {
       </section>
 
       {/* Per-turn breakdown */}
-      <section className='glass-panel rounded-2xl p-5 space-y-4 shadow-sm'>
+      <section className='glass-panel rounded-2xl p-5 shadow-sm'>
         <h2 className='text-label-caps text-muted-foreground'>Vuorot eriteltynä</h2>
-        {([0, 1] as const).map((ri) => {
-          const round = rounds[ri]
-          if(!round) return null
-          return (
-            <div key={ri} className='space-y-2'>
-              <h3 className='text-sm font-semibold'>Erä {ri + 1}</h3>
-              <div className='grid grid-cols-2 gap-2'>
-                {([0, 1] as const).map((ti) => {
-                  const turns = ti === 0 ? round.teamATurns : round.teamBTurns
-                  const override = ti === 0 ? round.teamAOverride : round.teamBOverride
-                  return (
-                    <div key={ti} className='space-y-1'>
-                      <p className='text-label-caps text-muted-foreground'>{teams[ti].name}</p>
-                      {turns.map((turn, i) => {
-                        const throwsSoFar = turns
-                          .slice(0, i + 1)
-                          .flatMap(t => Array.from(t.throws))
-                        const akat = deriveAkat(throwsSoFar)
-                        const papit = turn.throws[turn.throws.length - 1].pappiCount
-                        return (
-                          <div
-                            key={i}
-                            className='text-xs bg-white/60 rounded-lg px-2 py-1 flex justify-between border border-border/30'
-                          >
-                            <span>Vuoro {i + 1}</span>
-                            <span>
-                              {turn.result.fieldCleared
-                                ? `+${turn.result.unusedKartut}`
-                                : `A:${akat} P:${papit}`}
-                            </span>
+        <div className='mt-4 flex flex-col gap-4'>
+          {([0, 1] as const).map((ri) => {
+            const round = rounds[ri]
+            if(!round) return null
+            return (
+              <div key={ri} className='flex flex-col gap-2'>
+                <h3 className='text-sm font-semibold'>Erä {ri + 1}</h3>
+                <div className='grid grid-cols-2 gap-2'>
+                  {([0, 1] as const).map((ti) => {
+                    const turns = ti === 0 ? round.teamATurns : round.teamBTurns
+                    const override = ti === 0 ? round.teamAOverride : round.teamBOverride
+                    return (
+                      <div key={ti} className='flex flex-col gap-1'>
+                        <p className='text-label-caps text-muted-foreground'>{teams[ti].name}</p>
+                        {turns.map((turn, i) => {
+                          const throwsSoFar = turns
+                            .slice(0, i + 1)
+                            .flatMap(t => Array.from(t.throws))
+                          const akat = deriveAkat(throwsSoFar)
+                          const papit = turn.throws.reduce((sum, t) => sum + t.pappiCount, 0)
+                          const totalKnockOuts = turn.throws.reduce((sum, t) => sum + t.knockedOut, 0)
+                          return (
+                            <Collapsible
+                              key={i}
+                              className='rounded-lg border border-border/30 bg-white/60 px-2 py-1'
+                            >
+                              <CollapsibleTrigger className='mt-1 text-xs text-muted-foreground cursor-pointer w-full'>
+                                <div className='flex items-center justify-between'>
+                                  <span>Vuoro {i + 1}</span>
+                                  <span>
+                                    {turn.result.fieldCleared
+                                      ? `+${turn.result.unusedKartut}`
+                                      : `A:${akat} K:${totalKnockOuts} P:${papit}`}
+                                  </span>
+                                </div>
+                              </CollapsibleTrigger>
+                              <CollapsibleContent className='pt-1'>
+                                <div className='flex flex-col gap-1'>
+                                  <span className='text-xs px-2 py-1'>Pelaajien heitot</span>
+                                  {turn.throws.map((playerThrow, throwIndex) => (
+                                    <div
+                                      key={throwIndex}
+                                      className='flex items-center justify-between rounded bg-background/70 px-2 py-1 text-xs'
+                                    >
+                                      <span>Heitto {throwIndex + 1}</span>
+                                      <span>K:{playerThrow.knockedOut} P:{playerThrow.pappiCount}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </CollapsibleContent>
+                            </Collapsible>
+                          )
+                        })}
+                        {override !== undefined && (
+                          <div className='text-xs bg-accent rounded-lg px-2 py-1 flex justify-between border border-border/30'>
+                            <span>Korjaus</span>
+                            <span>{override}p</span>
                           </div>
-                        )
-                      })}
-                      {override !== undefined && (
-                        <div className='text-xs bg-accent rounded-lg px-2 py-1 flex justify-between border border-border/30'>
-                          <span>Korjaus</span>
-                          <span>{override}p</span>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
+        </div>
       </section>
 
       <button

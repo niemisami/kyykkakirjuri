@@ -18,6 +18,7 @@ import { deriveAkat, PlayerThrowInputSchema, RoundOverrideSchema } from '@/lib/s
 import type { PlayerThrowRecord } from '@/lib/schemas'
 import { getPlayerPair } from '@/lib/playerPairing'
 import { Minus, Plus } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 function fieldErrors(field: AnyFieldApi): string {
   return field.state.meta.errors
@@ -214,6 +215,7 @@ function RecordForm({
                 value={field.state.value}
                 onChange={field.handleChange}
                 field={field}
+                min={-40}
               />
             )}
           </form.Field>
@@ -327,6 +329,7 @@ function EditForm({
                 value={field.state.value}
                 onChange={field.handleChange}
                 field={field}
+                min={-40}
               />
             )}
           </form.Field>
@@ -544,23 +547,33 @@ function NumberStepper({
   onChange,
   field,
   highlight = false,
+  min = 0,
+  max = 40,
 }: {
   label: string
   value: number
   onChange: (v: number) => void
   field: AnyFieldApi
   highlight?: boolean
+  min?: number
+  max?: number
 }) {
   const errorMsg = fieldErrors(field)
+  const isDecrementDisabled = value <= min
+  const isIncrementDisabled = value >= max
   return (
     <div className='flex flex-col items-center gap-4'>
       <label className='text-label-caps text-muted-foreground'>{label}</label>
       <div className='flex items-center gap-4'>
         <button
           type='button'
-          onClick={() => onChange(Math.max(0, value - 1))}
+          onClick={() => onChange(Math.max(min, value - 1))}
           aria-label={`Vähennä ${label}`}
-          className='w-14 h-14 rounded-full border-2 border-border flex items-center justify-center active:scale-90 transition-transform bg-white/50 hover:bg-white text-xl font-bold text-accent-foreground'
+          className={cn('w-14 h-14 rounded-full border-2 border-border flex items-center justify-center active:scale-90 transition-transform bg-white/50 hover:bg-white text-xl font-bold text-accent-foreground',
+            {
+              'opacity-50 cursor-not-allowed': isDecrementDisabled,
+            })}
+          disabled={isDecrementDisabled}
         >
           <Minus size={16} strokeWidth={4} />
         </button>
@@ -568,17 +581,20 @@ function NumberStepper({
           <input
             type='number'
             value={value}
-            min={0}
-            max={40}
-            onChange={e => onChange(Math.max(0, Math.min(40, e.target.valueAsNumber || 0)))}
+            min={min}
+            max={max}
+            onChange={e => onChange(Math.max(min, Math.min(max, e.target.valueAsNumber || 0)))}
             className='w-full text-center text-score-display text-[48px] bg-transparent border-none focus:outline-none focus:ring-0'
           />
         </div>
         <button
           type='button'
-          onClick={() => onChange(Math.min(40, value + 1))}
+          onClick={() => onChange(Math.min(max, value + 1))}
           aria-label={`Lisää ${label}`}
-          className='w-14 h-14 rounded-full border-2 border-border flex items-center justify-center active:scale-90 transition-transform bg-white/50 hover:bg-white text-xl font-bold text-accent-foreground'
+          className={cn('w-14 h-14 rounded-full border-2 border-border flex items-center justify-center active:scale-90 transition-transform bg-white/50 hover:bg-white text-xl font-bold text-accent-foreground', {
+            'opacity-50 cursor-not-allowed': isIncrementDisabled,
+          })}
+          disabled={isIncrementDisabled}
         >
           <Plus size={16} strokeWidth={4} />
         </button>
