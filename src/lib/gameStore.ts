@@ -130,6 +130,10 @@ export function getRoundScore(round: RoundData | null, teamIndex: 0 | 1): number
   ).points
 }
 
+function derivePapit(throwHistory: PlayerThrowRecord[]): number {
+  return throwHistory.reduce((sum, t) => sum + t.pappiCount, 0)
+}
+
 // ── Actions ───────────────────────────────────────────────────────────────────
 
 /** Issue 3: Validate setup and start a game. */
@@ -170,11 +174,12 @@ export function recordPlayerThrow(knockedOut: number, pappiCount: number) {
     const allThrows = [...precedingThrows, currentThrow]
 
     const akat = deriveAkat(allThrows)
+    const papitNow = derivePapit(allThrows)
     const singleThrowIndexWithinTurn =
       (playerThrowIndex * 2 + singleThrowIndex + 1) as 1 | 2 | 3 | 4
     const result = scorePlayerThrow(
       akat,
-      pappiCount,
+      papitNow,
       teamTurnIndex + 1,
       TURNS_PER_ROUND,
       singleThrowIndexWithinTurn
@@ -291,9 +296,10 @@ export function editTurn(
       const playerthrow = requestedThrows[i]
       const history = [...precedingThrows, ...computedThrows, playerthrow]
       const akat = deriveAkat(history)
+      const papitNow = derivePapit(history)
       const result = scorePlayerThrow(
         akat,
-        playerthrow.pappiCount,
+        papitNow,
         teamTurnIndex + 1,
         TURNS_PER_ROUND,
         (i + 1) as 1 | 2 | 3 | 4
@@ -359,9 +365,10 @@ export function editPlayerThrow(
       const playerthrow = updatedThrows[i]
       const history = [...precedingThrows, ...recomputedThrows, playerthrow]
       const akat = deriveAkat(history)
+      const papitNow = derivePapit(history)
       const result = scorePlayerThrow(
         akat,
-        playerthrow.pappiCount,
+        papitNow,
         teamTurnIndex + 1,
         TURNS_PER_ROUND,
         (i + 1) as 1 | 2 | 3 | 4

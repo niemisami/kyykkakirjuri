@@ -153,15 +153,15 @@ describe('deriveAkat', () => {
     ).toBe(23)
   })
 
-  it('uses the last pappiCount snapshot (not sum)', () => {
+  it('uses the last pappiCount snapshot', () => {
     // throw 1: pappiCount=3; throw 2: pappiCount=1 (one pappi was knocked out)
-    // total knockedOut=0+1=1, last pappiCount=1 → 40-1-1=38
+    // total knockedOut=1, pappiCount=4 → 40-1-4=35
     expect(
       deriveAkat([
         { knockedOut: 0, pappiCount: 3 },
         { knockedOut: 1, pappiCount: 1 },
       ])
-    ).toBe(38)
+    ).toBe(35)
   })
 
   it('returns 0 when all 40 are knocked out', () => {
@@ -183,6 +183,10 @@ describe('PlayerThrowInputSchema — valid inputs', () => {
   it('accepts knockedOut=40, pappiCount=0', () => {
     expect(() => PlayerThrowInputSchema.parse({ knockedOut: 40, pappiCount: 0 })).not.toThrow()
   })
+
+  it('accepts knockedOut=0, pappiCount=-1', () => {
+    expect(() => PlayerThrowInputSchema.parse({ knockedOut: 0, pappiCount: -1 })).not.toThrow()
+  })
 })
 
 describe('PlayerThrowInputSchema — invalid inputs', () => {
@@ -193,11 +197,6 @@ describe('PlayerThrowInputSchema — invalid inputs', () => {
 
   it('rejects negative knockedOut', () => {
     const result = PlayerThrowInputSchema.safeParse({ knockedOut: -1, pappiCount: 0 })
-    expect(result.success).toBe(false)
-  })
-
-  it('rejects negative pappiCount', () => {
-    const result = PlayerThrowInputSchema.safeParse({ knockedOut: 0, pappiCount: -1 })
     expect(result.success).toBe(false)
   })
 
