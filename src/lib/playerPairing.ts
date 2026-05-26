@@ -1,5 +1,5 @@
 /**
- * Returns the pair of players throwing at a given turnIndex (0-based, 0–3).
+ * Returns the pair of players throwing at a given turnIndex (0-based, 0-3).
  * Pairs: turns 0 & 2 → players[0] + players[1]
  *        turns 1 & 3 → players[2] + players[3]
  * Degrades gracefully for teams with fewer than 4 players (indices wrap around).

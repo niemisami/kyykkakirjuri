@@ -287,7 +287,7 @@ function EditForm({
     },
   })
 
-  const label = `Muokkaa: ${teamName} – vuoro ${teamTurnIndex + 1}, pelaaja ${playerIndex + 1}, heitto ${throwIndexWithinPlayer + 1}`
+  const label = `Muokkaa: ${teamName} - vuoro ${teamTurnIndex + 1}, pelaaja ${playerIndex + 1}, heitto ${throwIndexWithinPlayer + 1}`
 
   return (
     <section className='glass-panel rounded-2xl p-6 space-y-4 shadow-md border-amber-200'>

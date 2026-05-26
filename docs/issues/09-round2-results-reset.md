@@ -22,7 +22,7 @@ Complete the full game loop: round 2 plays out using the same TurnStep flow, the
 ## Acceptance criteria
 
 - [x] Round 2 uses the same TurnStep with a visible "Erä 2" label
-- [x] Edit turn, round override, and field-cleared (Issues 5–7) work in round 2 as in round 1
+- [x] Edit turn, round override, and field-cleared (Issues 5-7) work in round 2 as in round 1
 - [x] After the last turn of round 2 the app automatically shows the results screen
 - [x] Results screen shows round 1 score, round 2 score, and total for each team
 - [x] Winner (or tie) is declared clearly in Finnish

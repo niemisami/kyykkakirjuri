@@ -78,7 +78,7 @@ Actions exposed by the store:
 
 ### Module: Player pairing
 
-Given a team's ordered player list (length 1–4) and a turn index (0–3), returns the two players throwing that turn:
+Given a team's ordered player list (length 1-4) and a turn index (0-3), returns the two players throwing that turn:
 
 - Pair A: players at index 0 and 1 (turns 0 and 2)
 - Pair B: players at index 2 and 3 (turns 1 and 3)
@@ -86,8 +86,8 @@ Given a team's ordered player list (length 1–4) and a turn index (0–3), retu
 
 ### Module: Validation schemas (Zod)
 
-- `TurnInputSchema` — `{ akat: number (0–40), papit: number (0–40) }` with a refinement: `akat + papit ≤ 40`
-- `GameSetupSchema` — `{ teamAName: string (non-empty), teamBName: string (non-empty), teamAPlayers: string[] (length 1–4), teamBPlayers: string[] (length 1–4) }`
+- `TurnInputSchema` — `{ akat: number (0-40), papit: number (-40-40) }` with a refinement: `akat + papit ≤ 40`
+- `GameSetupSchema` — `{ teamAName: string (non-empty), teamBName: string (non-empty), teamAPlayers: string[] (length 1-4), teamBPlayers: string[] (length 1-4) }`
 - `RoundOverrideSchema` — `{ points: number }` (integer, no bounds; allows positive for field-cleared)
 
 ### UI: Single-screen stepper
@@ -129,8 +129,8 @@ State transition tests:
 - `resetGame` returns the state to `setup`.
 
 ### Player pairing
-- For a 4-player team, turn indices 0–3 produce the correct pairs.
-- For teams with 1–3 players, pairing degrades without throwing.
+- For a 4-player team, turn indices 0-3 produce the correct pairs.
+- For teams with 1-3 players, pairing degrades without throwing.
 
 ### Validation schemas
 - `TurnInputSchema` rejects akat + papit > 40.
@@ -145,7 +145,7 @@ State transition tests:
 - **Gender-specific throw lines** — the app does not track player gender or display throw distances.
 - **Avaus as a distinct event** — the mandatory opening throw is treated as part of the first turn.
 - **Tournament management** — no brackets, standings tables, or multi-game history.
-- **More than 2 teams / non-standard formats** — the app assumes exactly 2 teams of 1–4 players.
+- **More than 2 teams / non-standard formats** — the app assumes exactly 2 teams of 1-4 players.
 - **Referee authentication or multi-device sync** — no login, no shared state across devices.
 - **Offline PWA / installable app** — the app is a mobile web page; no service worker or install prompt in MVP.
 

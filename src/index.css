@@ -84,13 +84,13 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.149 0.005 249);
 
-  /* Primary – crimson red */
+  /* Primary - crimson red */
   --primary: oklch(0.473 0.213 12.6);
   /* #b80035 */
   --primary-foreground: oklch(1 0 0);
   /* white */
 
-  /* Primary container – vivid red */
+  /* Primary container - vivid red */
   --primary-container: oklch(0.556 0.228 13.4);
   /* #e11d48 */
   --primary-container-foreground: oklch(0.99 0.006 343);

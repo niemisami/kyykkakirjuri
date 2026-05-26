@@ -49,9 +49,9 @@ export function Scoreboard({ teamAName, teamBName, round1, round2, roundIndex }:
           <>
             <div className='w-full h-px bg-border/40' />
             <div className='flex gap-3 text-[12px] text-muted-foreground flex-wrap justify-center'>
-              <span>Erä 1: {r1A} – {r1B}</span>
+              <span>Erä 1: {r1A} - {r1B}</span>
               <span>•</span>
-              <span className='font-bold'>Yhteensä: {game.teamA} – {game.teamB}</span>
+              <span className='font-bold'>Yhteensä: {game.teamA} - {game.teamB}</span>
             </div>
           </>
         )

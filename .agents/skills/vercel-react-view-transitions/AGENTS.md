@@ -54,24 +54,24 @@ Every `<ViewTransition>` should communicate a spatial relationship or continuity
 
 Implement **all** applicable patterns from this list, in this order:
 
-| Priority | Pattern | What it communicates |
-|----------|---------|---------------------|
-| 1 | **Shared element** (`name`) | "Same thing — going deeper" |
-| 2 | **Suspense reveal** | "Data loaded" |
-| 3 | **List identity** (per-item `key`) | "Same items, new arrangement" |
-| 4 | **State change** (`enter`/`exit`) | "Something appeared/disappeared" |
-| 5 | **Route change** (layout-level) | "Going to a new place" |
+| Priority | Pattern                            | What it communicates             |
+| -------- | ---------------------------------- | -------------------------------- |
+| 1        | **Shared element** (`name`)        | "Same thing — going deeper"      |
+| 2        | **Suspense reveal**                | "Data loaded"                    |
+| 3        | **List identity** (per-item `key`) | "Same items, new arrangement"    |
+| 4        | **State change** (`enter`/`exit`)  | "Something appeared/disappeared" |
+| 5        | **Route change** (layout-level)    | "Going to a new place"           |
 
 This is an implementation order, not a "pick one" list. Implement every pattern that fits the app. Only skip a pattern if the app has no use case for it.
 
 ### Choosing Animation Style
 
-| Context | Animation | Why |
-|---------|-----------|-----|
-| Hierarchical navigation (list → detail) | Type-keyed `nav-forward` / `nav-back` | Communicates spatial depth |
-| Lateral navigation (tab-to-tab) | Bare `<ViewTransition>` (fade) or `default="none"` | No depth to communicate |
-| Suspense reveal | `enter`/`exit` string props | Content arriving |
-| Revalidation / background refresh | `default="none"` | Silent — no animation needed |
+| Context                                 | Animation                                          | Why                          |
+| --------------------------------------- | -------------------------------------------------- | ---------------------------- |
+| Hierarchical navigation (list → detail) | Type-keyed `nav-forward` / `nav-back`              | Communicates spatial depth   |
+| Lateral navigation (tab-to-tab)         | Bare `<ViewTransition>` (fade) or `default="none"` | No depth to communicate      |
+| Suspense reveal                         | `enter`/`exit` string props                        | Content arriving             |
+| Revalidation / background refresh       | `default="none"`                                   | Silent — no animation needed |
 
 Reserve directional slides for hierarchical navigation (list → detail) and ordered sequences (prev/next photo, carousel, paginated results). For ordered sequences, the direction communicates position: "next" slides from right, "previous" from left. Lateral/unordered navigation (tab-to-tab) should not use directional slides — it falsely implies spatial depth.
 
@@ -101,12 +101,12 @@ React auto-assigns a unique `view-transition-name` and calls `document.startView
 
 ### Animation Triggers
 
-| Trigger | When it fires |
-|---------|--------------|
-| **enter** | VT first inserted during a Transition |
-| **exit** | VT first removed during a Transition |
+| Trigger    | When it fires                                                                     |
+| ---------- | --------------------------------------------------------------------------------- |
+| **enter**  | VT first inserted during a Transition                                             |
+| **exit**   | VT first removed during a Transition                                              |
 | **update** | DOM mutations inside a VT. With nested VTs, mutation applies to the innermost one |
-| **share** | Named VT unmounts and another with same `name` mounts in same Transition |
+| **share**  | Named VT unmounts and another with same `name` mounts in same Transition          |
 
 Only `startTransition`, `useDeferredValue`, or `Suspense` activate VTs. Regular `setState` does not animate.
 
@@ -340,13 +340,13 @@ Before writing any code, scan the codebase thoroughly. Search for:
 Then classify every navigation and produce a navigation map:
 
 ```
-| Route           | Navigates to         | Direction    | VT pattern            |
-|-----------------|----------------------|--------------|-----------------------|
-| /               | /detail/[id]         | forward      | directional slide     |
-| /detail/[id]    | /                    | back         | directional slide     |
-| /detail/[id]    | /detail/[other]      | sequential   | directional slide (ordered prev/next) or key+share crossfade |
-| /tab/[a]        | /tab/[b]             | lateral      | key+share crossfade   |
-| (Suspense)      | (content loads)      | —            | slide-up reveal       |
+| Route        | Navigates to    | Direction  | VT pattern                                                   |
+| ------------ | --------------- | ---------- | ------------------------------------------------------------ |
+| /            | /detail/[id]    | forward    | directional slide                                            |
+| /detail/[id] | /               | back       | directional slide                                            |
+| /detail/[id] | /detail/[other] | sequential | directional slide (ordered prev/next) or key+share crossfade |
+| /tab/[a]     | /tab/[b]        | lateral    | key+share crossfade                                          |
+| (Suspense)   | (content loads) | —          | slide-up reveal                                              |
 ```
 
 For each shared element (`name` prop), note where a pair forms and where it doesn't — this determines whether you need `enter`/`exit` as a fallback alongside `share`.
@@ -622,12 +622,12 @@ Imperative control via `onEnter`, `onExit`, `onUpdate`, `onShare`. Always return
 
 ## Animation Timing
 
-| Interaction | Duration |
-|------------|----------|
-| Direct toggle | 100–200ms |
-| Route transition | 150–250ms |
-| Suspense reveal | 200–400ms |
-| Shared element morph | 300–500ms |
+| Interaction          | Duration  |
+| -------------------- | --------- |
+| Direct toggle        | 100-200ms |
+| Route transition     | 150-250ms |
+| Suspense reveal      | 200-400ms |
+| Shared element morph | 300-500ms |
 
 ---
 

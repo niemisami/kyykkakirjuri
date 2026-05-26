@@ -40,7 +40,7 @@ export interface GameState {
   /** rounds[0] = round 1, rounds[1] = round 2 */
   rounds: [RoundData | null, RoundData | null]
   roundIndex: 0 | 1
-  /** 0–7: position in the current round (even = team A, odd = team B) */
+  /** 0-7: position in the current round (even = team A, odd = team B) */
   turnIndex: number
   /** 0 = first player in pair, 1 = second player in pair */
   playerThrowIndex: 0 | 1
@@ -86,7 +86,7 @@ function emptyRound(): RoundData {
 }
 
 /**
- * Returns the next valid turn index (0–7) after `currentTurnIndex`,
+ * Returns the next valid turn index (0-7) after `currentTurnIndex`,
  * skipping turns for teams that have already cleared the field.
  * Returns null when the round is complete.
  */
