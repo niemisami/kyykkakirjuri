@@ -2,15 +2,15 @@
 
 ## Parent
 
-[ADR-0002: Player-throw input model](../adr/0002-player-throw-input-model.md)
+[ADR-0004: Signed pappi delta in `pappiCount`](../adr/0004-signed-pappi-delta-in-pappiCount.md)
 
 ## What to build
 
 Update `TurnStep` so that `RecordForm` guides the referee through two sequential player throws per turn instead of a single combined akat/papit input.
 
-The form shows which individual player is currently throwing (not just the pair), and the two input fields are `knockedOut` (Poistot) and `pappiCount` (Papit). After each submission the store advances `playerThrowIndex`; the form resets and shows the second player's name.
+The form shows which individual player is currently throwing (not just the pair), and the two input fields are `knockedOut` (Poistot) and `pappiCount` (Papit). `pappiCount` is a signed pappi delta (positive = papit created, negative = pappi struck back inside). After each submission the store advances `playerThrowIndex`; the form resets and shows the second player's name.
 
-A live derived line replaces the current "Tyhjennetty" counter, showing `akat = 40 − ΣknockedOut − pappiCount` computed from the current round's throw history so the referee can sanity-check the count before confirming.
+A live derived line replaces the current "Tyhjennetty" counter, showing `akat = 40 − ΣknockedOut − ΣpappiCount` computed from the current round's throw history so the referee can sanity-check the count before confirming.
 
 The history panel adapts to display per-throw data: each turn row expands to show both throws with their `knockedOut` and `pappiCount` values. The existing `fieldClearedBanner` and round-info header require no changes.
 

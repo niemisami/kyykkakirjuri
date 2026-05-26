@@ -2,7 +2,7 @@
 
 ## Parent
 
-[ADR-0002: Player-throw input model](../adr/0002-player-throw-input-model.md)
+[ADR-0004: Signed pappi delta in `pappiCount`](../adr/0004-signed-pappi-delta-in-pappiCount.md)
 
 ## What to build
 
@@ -19,7 +19,7 @@ interface GameState {
 
 `recordPlayerThrow(knockedOut: number, pappiCount: number)`:
 1. Derives `akat` from the full throw history for that team in the current round.
-2. Calls `scorePlayerThrow(akat, pappiCount, teamTurnIndex + 1, TURNS_PER_ROUND, playerThrowIndex + 1)`.
+2. Derives `papitNow` from cumulative `pappiCount` deltas in that team's throw history for the round, then calls `scorePlayerThrow(akat, papitNow, teamTurnIndex + 1, TURNS_PER_ROUND, playerThrowIndex + 1)`.
 3. Appends the `PlayerThrowRecord` to the in-progress turn.
 4. If `fieldCleared` after throw 1: sets `fieldClearedBanner`, marks team cleared, skips player 2's throw (advance `playerThrowIndex` past 1 and move to the next turn).
 5. After throw 2 (or a mid-turn field clear): finalises the `TurnRecord`, advances `turnIndex` / phase as before.

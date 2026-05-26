@@ -2,16 +2,16 @@
 
 ## Parent
 
-[ADR-0002: Player-throw input model](../adr/0002-player-throw-input-model.md)
+[ADR-0004: Signed pappi delta in `pappiCount`](../adr/0004-signed-pappi-delta-in-pappiCount.md)
 
 ## What to build
 
 Introduce `PlayerThrowRecord` as the new atomic unit of recorded data, and reshape `TurnRecord` so that a turn is defined by its throws rather than a single akat/papit snapshot.
 
-The input model (from ADR-0002): the referee records `knockedOut` (delta — how many kyykät of any type exited the game zone this throw) and `pappiCount` (snapshot — how many kyykät are on the boundary right now). Akat is always derived:
+The input model (from ADR-0004): the referee records `knockedOut` (delta — how many kyykät of any type exited the game zone this throw) and `pappiCount` (signed pappi delta for this throw). Akat is always derived:
 
 ```ts
-akat = 40 − Σ(knockedOut across all throws so far in the round) − pappiCount
+akat = 40 − Σ(knockedOut across all throws so far in the round) − Σ(pappiCount across all throws so far in the round)
 ```
 
 Type shapes:
@@ -19,7 +19,7 @@ Type shapes:
 ```ts
 interface PlayerThrowRecord {
   knockedOut: number   // delta: exits this throw (akat or pappi)
-  pappiCount: number   // snapshot: boundary count right now
+  pappiCount: number   // signed delta: papit created (+) or struck back inside (−)
 }
 
 interface TurnRecord {
@@ -30,7 +30,7 @@ interface TurnRecord {
 
 `akat` and `papit` are removed from `TurnRecord` — they are now computed via a `deriveAkat(throwHistory: PlayerThrowRecord[])` helper that takes the full throw history for the round (not just a single record).
 
-`PlayerThrowInputSchema` (Zod): validates `knockedOut ≥ 0`, `pappiCount ≥ 0`, `knockedOut + pappiCount ≤ 40` (field-level bounds only; cumulative validation stays in the store).
+`PlayerThrowInputSchema` (Zod): validates `knockedOut ≥ 0`, `pappiCount ∈ [-40, 40]`, `knockedOut + pappiCount ≤ 40` (field-level bounds only; cumulative validation stays in the store).
 
 ## Acceptance criteria
 

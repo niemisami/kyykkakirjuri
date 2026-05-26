@@ -1,5 +1,7 @@
 # Player-throw input model: knockedOut delta + pappiCount snapshot
 
+Superseded by ADR-0004.
+
 Per player throw the referee records two values: `knockedOut` (how many kyykät of any type exited the game zone during this throw — a delta) and `pappiCount` (how many kyykät are resting on the boundary right now — a snapshot). The app derives remaining akat as `40 − ΣknockedOut − pappiCount`.
 
 ## Considered options

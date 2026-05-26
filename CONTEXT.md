@@ -50,12 +50,12 @@ One player's full throwing opportunity within a turn: 2 kartut. A player throw c
 Finnish: Pelaajan heittovuoro
 
 **Single throw**:
-One individual karttu throw by a single player. The referee records one `knockedOut` delta and one `pappiCount` snapshot after each single throw.
+One individual karttu throw by a single player. The referee records one `knockedOut` delta and one signed pappi delta (stored in field `pappiCount`) after each single throw.
 Finnish: Yksittäinen heitto
 _Avoid_: player throw, turn
 
 **Knocked out (poistettu)**:
-A kyykkä that has left the game square entirely during a single throw, whether it was previously inside (akka) or on the boundary (pappi). Recorded per single throw as `knockedOut` — a delta of how many exited during this specific throw, not a running total. The cumulative sum across all single throws in a round, combined with the current `pappiCount`, gives: `akat = 40 − ΣknockedOut − pappiCount`.
+A kyykkä that has left the game square entirely during a single throw, whether it was previously inside (akka) or on the boundary (pappi). Recorded per single throw as `knockedOut` — a delta of how many exited during this specific throw, not a running total. The cumulative sum across all single throws in a round, combined with cumulative pappi deltas, gives: `akat = 40 − ΣknockedOut − ΣpappiCount`.
 Finnish singular: poistettu. Finnish plural / UI label: Poistot.
 _Avoid_: cleared (use "field cleared" only for the scoring event), removed
 
@@ -83,6 +83,11 @@ A kyykkä resting on the **boundary line** of the target square at the time of s
 Finnish: Pappi or papit for multiple
 _Avoid_: boundary piece, edge piece
 
+**Pappi delta (stored in `pappiCount`)**:
+The signed change in the number of papit caused by a single throw. Positive means papit were created on the boundary; negative means a previously boundary kyykkä was struck back into the game square.
+Finnish UI field label: Papit
+_Avoid_: pappi snapshot, absolute pappi count
+
 **Kuokkavieras**:
 A kyykkä that has bounced into the gap between the two target squaret. Per official rules, worth −2 points. **Not tracked by this app** — see ADR-0001.
 Finnish: Kuokkavieras
@@ -98,9 +103,9 @@ _Avoid_: "full clear", "bonus"
 ## Example dialogue
 
 > **Referee**: "First karttu: 4 flew out, and I see 1 pappi on the line."
-> **Dev**: "Record that as single throw: knockedOut = 4, pappiCount = 1."
-> **Referee**: "Second karttu by same player: 2 more flew out, now 0 papit."
-> **Dev**: "Record the next single throw. The app updates akat and score from cumulative throws."
+> **Dev**: "Record that single throw as knockedOut = 4, pappiCount = +1."
+> **Referee**: "Second karttu by same player hit that pappi back inside, and nothing flew out."
+> **Dev**: "Record that single throw as knockedOut = 0, pappiCount = -1. The app updates akat and score from cumulative deltas."
 > **Referee**: "The next team just cleared everything on turn 3."
 > **Dev**: "Akat = 0 and papit = 0 after turn 3 of 4 — field cleared. Their round score is +4 (4 unused kartut)."
 > **Referee**: "What about that kyykkä that bounced into the middle?"

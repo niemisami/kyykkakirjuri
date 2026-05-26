@@ -2,7 +2,7 @@
 
 ## Parent
 
-[ADR-0002: Player-throw input model](../adr/0002-player-throw-input-model.md)
+[ADR-0004: Signed pappi delta in `pappiCount`](../adr/0004-signed-pappi-delta-in-pappiCount.md)
 
 ## What to build
 
