@@ -1,1 +1,8 @@
-// Schema definitions will be added here
+export * from './team'
+export * from './player'
+export * from './event'
+export * from './game'
+export * from './gameTeam'
+export * from './gameTeamPlayer'
+export * from './gameKyykkaScore'
+export * from './relations'
