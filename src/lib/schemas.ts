@@ -53,7 +53,7 @@ export const PlayerThrowInputSchema = z
       .min(0, 'Papit ei voi olla negatiivinen')
       .max(40, 'Pappi-arvo liian suuri'),
   })
-  .refine((v) => v.knockedOut + v.pappiCount <= 40, {
+  .refine(v => v.knockedOut + v.pappiCount <= 40, {
     message: 'Poistetut ja papit yhteensä enintään 40',
     path: ['knockedOut'],
   })
@@ -75,7 +75,7 @@ export const TurnInputSchema = z
       .min(0, 'Papit ei voi olla negatiivinen')
       .max(40, 'Pappi-arvo liian suuri'),
   })
-  .refine((v) => v.akat + v.papit <= 40, {
+  .refine(v => v.akat + v.papit <= 40, {
     message: 'Akat ja papit yhteensä enintään 40',
     path: ['akat'],
   })

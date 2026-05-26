@@ -12,7 +12,7 @@ export const Route = createFileRoute('/')({
 function IndexPage() {
   const state = useGameStore()
 
-  switch (state.phase) {
+  switch(state.phase) {
     case 'setup':
       return <SetupStep />
     case 'round':

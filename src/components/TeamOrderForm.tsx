@@ -1,28 +1,29 @@
-import { confirmHalftime, type Team } from '@/lib/gameStore';
+import { confirmHalftime } from '@/lib/gameStore'
+import type { Team } from '@/lib/gameStore'
 import {
-    closestCenter,
-    DndContext,
-    DragOverlay,
-    KeyboardSensor,
-    PointerSensor,
-    TouchSensor,
-    useSensor,
-    useSensors,
-    type DragEndEvent,
-    type DragStartEvent
-} from '@dnd-kit/core';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+  closestCenter,
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+
+} from '@dnd-kit/core'
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import {
-    SortableContext,
-    sortableKeyboardCoordinates,
-    useSortable,
-    verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useForm } from '@tanstack/react-form';
-import { GripVertical, X } from 'lucide-react';
-import { useState } from 'react';
-import { z } from 'zod';
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { useForm } from '@tanstack/react-form'
+import { GripVertical, X } from 'lucide-react'
+import { useState } from 'react'
+import { z } from 'zod'
 
 const HalftimeFormSchema = z.object({
   teamA: z.object({
@@ -64,35 +65,35 @@ function PlayerRowContent({
 }) {
   return (
     <div className={`space-y-1 ${isOverlay ? 'shadow-2xl rounded-xl' : ''}`}>
-      <div className="flex gap-2 items-center">
+      <div className='flex gap-2 items-center'>
         <button
           {...dndHandlerListeners}
-          type="button"
-          aria-label="Järjestä vetämällä"
-          className="touch-none p-1 text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing transition-colors"
+          type='button'
+          aria-label='Järjestä vetämällä'
+          className='touch-none p-1 text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing transition-colors'
         >
           <GripVertical size={18} />
         </button>
         <input
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={e => onChange(e.target.value)}
           onBlur={onBlur}
           placeholder={`Pelaaja ${index + 1}`}
-          className="flex-1 rounded-xl border-2 border-border bg-white/70 px-4 py-3 text-base focus:outline-none focus:border-primary transition-colors"
+          className='flex-1 rounded-xl border-2 border-border bg-white/70 px-4 py-3 text-base focus:outline-none focus:border-primary transition-colors'
         />
         {value && (
           <button
-            type="button"
+            type='button'
             onClick={onClear}
-            aria-label="Tyhjennä pelaajan nimi"
-            className="w-12 h-12 rounded-full border-2 border-destructive/50 text-destructive bg-white/50 hover:bg-destructive/10 flex items-center justify-center text-xl font-bold transition-colors"
+            aria-label='Tyhjennä pelaajan nimi'
+            className='w-12 h-12 rounded-full border-2 border-destructive/50 text-destructive bg-white/50 hover:bg-destructive/10 flex items-center justify-center text-xl font-bold transition-colors'
           >
             <X size={16} strokeWidth={4} />
           </button>
         )}
       </div>
       {errors.length > 0 && (
-        <p className="text-sm text-destructive">{errors.join(', ')}</p>
+        <p className='text-sm text-destructive'>{errors.join(', ')}</p>
       )}
     </div>
   )
@@ -144,19 +145,19 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(TouchSensor),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
   const form = useForm({
     defaultValues: {
-      teamA: { players: teams[0].players.map((name) => ({ name })) },
-      teamB: { players: teams[1].players.map((name) => ({ name })) },
+      teamA: { players: teams[0].players.map(name => ({ name })) },
+      teamB: { players: teams[1].players.map(name => ({ name })) },
     },
     validators: { onSubmit: HalftimeFormSchema },
     onSubmit: ({ value }) => {
       confirmHalftime(
-        value.teamA.players.map((p) => p.name),
-        value.teamB.players.map((p) => p.name),
+        value.teamA.players.map(p => p.name),
+        value.teamB.players.map(p => p.name)
       )
     },
   })
@@ -168,10 +169,10 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
         e.stopPropagation()
         form.handleSubmit()
       }}
-      className="space-y-6"
+      className='space-y-6'
     >
       {(['teamA', 'teamB'] as const).map((teamKey, idx) => (
-        <form.Field key={teamKey} name={`${teamKey}.players`} mode="array">
+        <form.Field key={teamKey} name={`${teamKey}.players`} mode='array'>
           {(playersField) => {
             const itemIds = playersField.state.value.map((item, i) => `${teamKey}-${item.name}-${i}`)
             const activeIndex = activeId ? itemIds.indexOf(activeId) : -1
@@ -182,10 +183,10 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
 
             function handleDragEnd(event: DragEndEvent) {
               const { active, over } = event
-              if (!over || active.id === over.id) return
+              if(!over || active.id === over.id) return
               const oldIndex = itemIds.indexOf(active.id as string)
               const newIndex = itemIds.indexOf(over.id as string)
-              if (oldIndex !== -1 && newIndex !== -1) {
+              if(oldIndex !== -1 && newIndex !== -1) {
                 playersField.moveValue(oldIndex, newIndex)
               }
               setActiveId(null)
@@ -202,15 +203,15 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
               >
-                <section className="glass-panel rounded-[2rem] p-8 space-y-5 shadow-md">
+                <section className='glass-panel rounded-[2rem] p-8 space-y-5 shadow-md'>
                   {/* TODO replace char – with ─ */}
-                  <h2 className="text-headline-md">{teams[idx].name} - pelaajat erässä 2</h2>
+                  <h2 className='text-headline-md'>{teams[idx].name} - pelaajat erässä 2</h2>
 
                   <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
-                    <div className="space-y-3">
-                      {playersField.state.value.map((_, i) =>(
+                    <div className='space-y-3'>
+                      {playersField.state.value.map((_, i) => (
                         <form.Field key={itemIds[i]} name={`${teamKey}.players[${i}].name`}>
-                          {(subField) => (
+                          {subField => (
                             <SortablePlayerRow
                               id={itemIds[i]}
                               index={i}
@@ -227,15 +228,15 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
                   </SortableContext>
 
                   {playersField.state.meta.errors.length > 0 && (
-                    <p className="text-sm text-destructive">
+                    <p className='text-sm text-destructive'>
                       {playersField.state.meta.errors.join(', ')}
                     </p>
                   )}
                   {playersField.state.value.length < 4 && (
                     <button
-                      type="button"
+                      type='button'
                       onClick={() => playersField.pushValue({ name: '' })}
-                      className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+                      className='text-sm font-semibold text-primary hover:text-primary/80 transition-colors'
                     >
                       + Lisää pelaaja
                     </button>
@@ -243,19 +244,21 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
                 </section>
 
                 <DragOverlay>
-                  {activeId && activeIndex !== -1 ? (
-                    <div className='bg-white rounded-full'>
-                    <PlayerRowContent
-                      index={activeIndex}
-                      value={playersField.state.value[activeIndex]?.name ?? ''}
-                      onChange={() => {}}
-                      onBlur={() => {}}
-                      errors={[]}
-                      onClear={() => {}}
-                      isOverlay
-                    />
-                    </div>
-                  ) : null}
+                  {activeId && activeIndex !== -1
+                    ? (
+                      <div className='bg-white rounded-full'>
+                        <PlayerRowContent
+                          index={activeIndex}
+                          value={playersField.state.value[activeIndex]?.name ?? ''}
+                          onChange={() => {}}
+                          onBlur={() => {}}
+                          errors={[]}
+                          onClear={() => {}}
+                          isOverlay
+                        />
+                      </div>
+                    )
+                    : null}
 
                 </DragOverlay>
               </DndContext>
@@ -265,12 +268,11 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
       ))}
 
       <button
-        type="submit"
-        className="w-full h-12 bg-primary-container text-primary-container-foreground rounded-xl font-bold text-body-lg active:scale-95 transition-all shadow-lg"
+        type='submit'
+        className='w-full h-12 bg-primary-container text-primary-container-foreground rounded-xl font-bold text-body-lg active:scale-95 transition-all shadow-lg'
       >
         Aloita erä 2
       </button>
     </form>
   )
 }
-

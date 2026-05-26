@@ -151,7 +151,7 @@ describe('deriveAkat', () => {
       deriveAkat([
         { knockedOut: 10, pappiCount: 0 },
         { knockedOut: 5, pappiCount: 2 },
-      ]),
+      ])
     ).toBe(23)
   })
 
@@ -162,7 +162,7 @@ describe('deriveAkat', () => {
       deriveAkat([
         { knockedOut: 0, pappiCount: 3 },
         { knockedOut: 1, pappiCount: 1 },
-      ]),
+      ])
     ).toBe(38)
   })
 

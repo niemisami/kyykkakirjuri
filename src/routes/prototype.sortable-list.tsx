@@ -10,8 +10,9 @@ import {
   closestCenter,
   useSensor,
   useSensors,
-  type DragEndEvent,
+
 } from '@dnd-kit/core'
+import type { DragEndEvent } from '@dnd-kit/core'
 import {
   SortableContext,
   arrayMove,
@@ -55,10 +56,10 @@ function SortableListPrototype() {
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
-    if (over && active.id !== over.id) {
+    if(over && active.id !== over.id) {
       setItems((prev) => {
-        const oldIndex = prev.findIndex((i) => i.id === active.id)
-        const newIndex = prev.findIndex((i) => i.id === over.id)
+        const oldIndex = prev.findIndex(i => i.id === active.id)
+        const newIndex = prev.findIndex(i => i.id === over.id)
         return arrayMove(prev, oldIndex, newIndex)
       })
     }
@@ -69,11 +70,11 @@ function SortableListPrototype() {
   }
 
   return (
-    <div className="min-h-screen p-6 flex flex-col items-center">
-      <div className="w-full max-w-md">
-        <div className="mb-6">
-          <p className="text-label-caps text-muted-foreground">PROTOTYPE</p>
-          <h1 className="text-headline-md mt-1">Sortable List</h1>
+    <div className='min-h-screen p-6 flex flex-col items-center'>
+      <div className='w-full max-w-md'>
+        <div className='mb-6'>
+          <p className='text-label-caps text-muted-foreground'>PROTOTYPE</p>
+          <h1 className='text-headline-md mt-1'>Sortable List</h1>
         </div>
 
         <DndContext
@@ -82,7 +83,7 @@ function SortableListPrototype() {
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={items.map((i) => i.id)}
+            items={items.map(i => i.id)}
             strategy={verticalListSortingStrategy}
           >
             {variant === 'A' && <VariantA items={items} />}
@@ -91,10 +92,10 @@ function SortableListPrototype() {
           </SortableContext>
         </DndContext>
 
-        <div className="mt-4 p-3 bg-muted rounded-lg">
-          <p className="text-label-caps text-muted-foreground mb-1">ORDER</p>
-          <p className="text-sm font-mono text-foreground">
-            {items.map((i) => i.label).join(' → ')}
+        <div className='mt-4 p-3 bg-muted rounded-lg'>
+          <p className='text-label-caps text-muted-foreground mb-1'>ORDER</p>
+          <p className='text-sm font-mono text-foreground'>
+            {items.map(i => i.label).join(' → ')}
           </p>
         </div>
       </div>
@@ -109,8 +110,8 @@ function SortableListPrototype() {
 
 function VariantA({ items }: { items: Item[] }) {
   return (
-    <div className="flex flex-col gap-2">
-      {items.map((item) => (
+    <div className='flex flex-col gap-2'>
+      {items.map(item => (
         <CardGripItem key={item.id} item={item} />
       ))}
     </div>
@@ -132,15 +133,15 @@ function CardGripItem({ item }: { item: Item }) {
     >
       <button
         {...listeners}
-        className="text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing touch-none p-1 -ml-1 rounded"
-        aria-label="Drag handle"
+        className='text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing touch-none p-1 -ml-1 rounded'
+        aria-label='Drag handle'
         tabIndex={-1}
       >
         <GripVertical size={20} />
       </button>
-      <div className="flex-1 min-w-0">
-        <p className="font-semibold text-foreground truncate">{item.label}</p>
-        <p className="text-sm text-muted-foreground">{item.subtitle}</p>
+      <div className='flex-1 min-w-0'>
+        <p className='font-semibold text-foreground truncate'>{item.label}</p>
+        <p className='text-sm text-muted-foreground'>{item.subtitle}</p>
       </div>
     </div>
   )
@@ -151,7 +152,7 @@ function CardGripItem({ item }: { item: Item }) {
 
 function VariantB({ items }: { items: Item[] }) {
   return (
-    <div className="divide-y divide-border border border-border rounded-lg overflow-hidden bg-card">
+    <div className='divide-y divide-border border border-border rounded-lg overflow-hidden bg-card'>
       {items.map((item, index) => (
         <CompactRowItem key={item.id} item={item} index={index + 1} />
       ))}
@@ -159,7 +160,7 @@ function VariantB({ items }: { items: Item[] }) {
   )
 }
 
-function CompactRowItem({ item, index }: { item: Item; index: number }) {
+function CompactRowItem({ item, index }: { item: Item, index: number }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
   })
@@ -172,17 +173,17 @@ function CompactRowItem({ item, index }: { item: Item; index: number }) {
         isDragging ? 'bg-accent opacity-60' : 'bg-card hover:bg-muted'
       }`}
     >
-      <span className="text-label-caps text-muted-foreground w-5 text-center shrink-0">
+      <span className='text-label-caps text-muted-foreground w-5 text-center shrink-0'>
         {index}
       </span>
-      <div className="flex-1 min-w-0">
-        <span className="text-sm font-medium text-foreground">{item.label}</span>
-        <span className="text-xs text-muted-foreground ml-2">{item.subtitle}</span>
+      <div className='flex-1 min-w-0'>
+        <span className='text-sm font-medium text-foreground'>{item.label}</span>
+        <span className='text-xs text-muted-foreground ml-2'>{item.subtitle}</span>
       </div>
       <button
         {...listeners}
-        className="text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing touch-none p-1 rounded shrink-0"
-        aria-label="Drag handle"
+        className='text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing touch-none p-1 rounded shrink-0'
+        aria-label='Drag handle'
         tabIndex={-1}
       >
         <GripVertical size={16} />
@@ -205,7 +206,7 @@ const PILL_COLORS = [
 
 function VariantC({ items }: { items: Item[] }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className='flex flex-col gap-2'>
       {items.map((item, index) => (
         <PillItem
           key={item.id}
@@ -217,7 +218,7 @@ function VariantC({ items }: { items: Item[] }) {
   )
 }
 
-function PillItem({ item, colorClass }: { item: Item; colorClass: string }) {
+function PillItem({ item, colorClass }: { item: Item, colorClass: string }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
   })
@@ -232,14 +233,14 @@ function PillItem({ item, colorClass }: { item: Item; colorClass: string }) {
     >
       <button
         {...listeners}
-        className="cursor-grab active:cursor-grabbing touch-none opacity-50 hover:opacity-100 p-0.5 rounded-full shrink-0"
-        aria-label="Drag handle"
+        className='cursor-grab active:cursor-grabbing touch-none opacity-50 hover:opacity-100 p-0.5 rounded-full shrink-0'
+        aria-label='Drag handle'
         tabIndex={-1}
       >
         <GripVertical size={16} />
       </button>
-      <span className="font-semibold text-sm flex-1">{item.label}</span>
-      <span className="text-xs opacity-60">{item.subtitle}</span>
+      <span className='font-semibold text-sm flex-1'>{item.label}</span>
+      <span className='text-xs opacity-60'>{item.subtitle}</span>
     </div>
   )
 }

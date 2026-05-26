@@ -6,7 +6,7 @@
  */
 export function getPlayerPair(players: string[], turnIndex: number): [string, string] {
   const n = players.length
-  if (turnIndex === 0 || turnIndex === 2) {
+  if(turnIndex === 0 || turnIndex === 2) {
     return [players[0 % n], players[1 % n]]
   }
   return [players[2 % n], players[3 % n]]

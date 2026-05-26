@@ -141,7 +141,7 @@ describe('recordPlayerThrow — basic flow', () => {
 
   it('transitions to halftime after all 8 turns', () => {
     freshGame()
-    for (let i = 0; i < 8; i++) recordNeutralTurn()
+    for(let i = 0; i < 8; i++) recordNeutralTurn()
     expect(gameStore.state.phase).toBe('halftime')
   })
 
@@ -246,7 +246,7 @@ describe('editTurn', () => {
 
   it('recalculates scores correctly after edit', () => {
     freshGame()
-    for (let i = 0; i < 8; i++) recordNeutralTurn() // all neutral → halftime
+    for(let i = 0; i < 8; i++) recordNeutralTurn() // all neutral → halftime
     // Edit team A turn 3 (teamTurnIndex=3): preceding 3 turns all {ko:0, pc:0}
     // throw2={ko:37,pc:1} → akat=40-37-1=2, score=2*(-2)+1*(-1)=-5
     editTurn(0, 0, 3, { knockedOut: 0, pappiCount: 0 }, { knockedOut: 37, pappiCount: 1 })
@@ -318,7 +318,7 @@ describe('editPlayerThrow', () => {
 describe('overrideRoundScore', () => {
   it('stores the override value for the team', () => {
     freshGame()
-    for (let i = 0; i < 4; i++) recordNeutralTurn()
+    for(let i = 0; i < 4; i++) recordNeutralTurn()
     overrideRoundScore(0, -3)
     expect(gameStore.state.rounds[0]!.teamAOverride).toBe(-3)
   })
@@ -342,7 +342,7 @@ describe('overrideRoundScore', () => {
 describe('confirmHalftime', () => {
   function reachHalftime() {
     freshGame()
-    for (let i = 0; i < 8; i++) recordNeutralTurn()
+    for(let i = 0; i < 8; i++) recordNeutralTurn()
   }
 
   it('transitions from halftime to round', () => {
@@ -393,14 +393,14 @@ describe('full state machine: setup → round(0) → halftime → round(1) → f
     expect(gameStore.state.phase).toBe('round')
     expect(gameStore.state.roundIndex).toBe(0)
 
-    for (let i = 0; i < 8; i++) recordNeutralTurn()
+    for(let i = 0; i < 8; i++) recordNeutralTurn()
     expect(gameStore.state.phase).toBe('halftime')
 
     confirmHalftime(['Alice', 'Bob', 'Carol', 'Dave'], ['Eve', 'Frank', 'Grace', 'Hank'])
     expect(gameStore.state.phase).toBe('round')
     expect(gameStore.state.roundIndex).toBe(1)
 
-    for (let i = 0; i < 8; i++) recordNeutralTurn()
+    for(let i = 0; i < 8; i++) recordNeutralTurn()
     expect(gameStore.state.phase).toBe('finished')
 
     resetGame()

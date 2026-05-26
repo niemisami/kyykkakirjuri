@@ -33,10 +33,10 @@ export function scorePlayerThrow(
   papit: number,
   turnIndex: number,
   totalTurns: number,
-  throwIndexWithinTurn: 1 | 2,
+  throwIndexWithinTurn: 1 | 2
 ): TurnResult {
   const fieldCleared = akat === 0 && papit === 0
-  if (fieldCleared) {
+  if(fieldCleared) {
     const remainingFullTurns = totalTurns - turnIndex
     // When cleared on the first player throw, player 2's 2 kartut are also unused
     const midTurnBonus = throwIndexWithinTurn === 1 ? 2 : 0
@@ -56,12 +56,12 @@ export function scorePlayerThrow(
  * @param override  Optional manual override — returned directly when provided
  */
 export function scoreRound(turns: TurnResult[], override?: number): RoundResult {
-  if (override !== undefined) {
+  if(override !== undefined) {
     return { points: override, fieldCleared: false }
   }
 
-  for (const turn of turns) {
-    if (turn.fieldCleared) {
+  for(const turn of turns) {
+    if(turn.fieldCleared) {
       return { points: turn.unusedKartut, fieldCleared: true }
     }
   }
@@ -76,8 +76,8 @@ export function scoreRound(turns: TurnResult[], override?: number): RoundResult 
  * @param round2  Round 2 scores { teamA, teamB }
  */
 export function scoreGame(
-  round1: { teamA: number; teamB: number },
-  round2: { teamA: number; teamB: number },
+  round1: { teamA: number, teamB: number },
+  round2: { teamA: number, teamB: number }
 ): GameResult {
   const teamA = round1.teamA + round2.teamA
   const teamB = round1.teamB + round2.teamB

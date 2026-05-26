@@ -32,18 +32,18 @@ export function SetupStep() {
     onSubmit: ({ value }) => {
       startGame(
         value.teamA.name,
-        value.teamA.players.map((p) => p.name),
+        value.teamA.players.map(p => p.name),
         value.teamB.name,
-        value.teamB.players.map((p) => p.name),
+        value.teamB.players.map(p => p.name)
       )
     },
   })
 
   return (
-    <main className="mx-auto max-w-[600px] px-4 pt-20 pb-8 space-y-6">
-      <div className="text-center">
-        <h1 className="text-headline-lg font-black tracking-tight">Kyykkakirjuri</h1>
-        <p className="mt-1 text-muted-foreground">Syötä joukkueet ja pelaajat</p>
+    <main className='mx-auto max-w-[600px] px-4 pt-20 pb-8 space-y-6'>
+      <div className='text-center'>
+        <h1 className='text-headline-lg font-black tracking-tight'>Kyykkakirjuri</h1>
+        <p className='mt-1 text-muted-foreground'>Syötä joukkueet ja pelaajat</p>
       </div>
 
       <form
@@ -52,29 +52,29 @@ export function SetupStep() {
           e.stopPropagation()
           form.handleSubmit()
         }}
-        className="space-y-6"
+        className='space-y-6'
       >
         {(['teamA', 'teamB'] as const).map((teamKey, idx) => (
-          <section key={teamKey} className="glass-panel rounded-[2rem] p-8 space-y-5 shadow-md">
-            <h2 className="text-headline-md">Joukkue {idx === 0 ? 'A' : 'B'}</h2>
+          <section key={teamKey} className='glass-panel rounded-[2rem] p-8 space-y-5 shadow-md'>
+            <h2 className='text-headline-md'>Joukkue {idx === 0 ? 'A' : 'B'}</h2>
 
             {/* Team name */}
             <form.Field name={`${teamKey}.name`}>
-              {(field) => (
+              {field => (
                 <div>
-                  <label htmlFor={field.name} className="text-label-caps text-muted-foreground block mb-2">
+                  <label htmlFor={field.name} className='text-label-caps text-muted-foreground block mb-2'>
                     Joukkueen nimi
                   </label>
                   <input
                     id={field.name}
                     value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={e => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
-                    placeholder="Joukkueen nimi"
-                    className="w-full rounded-xl border-2 border-border bg-white/70 px-4 py-3 text-base focus:outline-none focus:border-primary transition-colors"
+                    placeholder='Joukkueen nimi'
+                    className='w-full rounded-xl border-2 border-border bg-white/70 px-4 py-3 text-base focus:outline-none focus:border-primary transition-colors'
                   />
                   {field.state.meta.errors.length > 0 && (
-                    <p className="mt-1 text-sm text-destructive">
+                    <p className='mt-1 text-sm text-destructive'>
                       {field.state.meta.errors.join(', ')}
                     </p>
                   )}
@@ -83,24 +83,24 @@ export function SetupStep() {
             </form.Field>
 
             {/* Players */}
-            <form.Field name={`${teamKey}.players`} mode="array">
-              {(playersField) => (
-                <div className="space-y-3">
-                  <label className="text-label-caps text-muted-foreground block">Pelaajat</label>
+            <form.Field name={`${teamKey}.players`} mode='array'>
+              {playersField => (
+                <div className='space-y-3'>
+                  <label className='text-label-caps text-muted-foreground block'>Pelaajat</label>
 
                   {playersField.state.value.map((_, i) => (
                     <form.Field key={i} name={`${teamKey}.players[${i}].name`}>
-                      {(subField) => (
-                        <div className="space-y-1">
+                      {subField => (
+                        <div className='space-y-1'>
                           <input
                             value={subField.state.value}
-                            onChange={(e) => subField.handleChange(e.target.value)}
+                            onChange={e => subField.handleChange(e.target.value)}
                             onBlur={subField.handleBlur}
                             placeholder={`Pelaaja ${i + 1}`}
-                            className="w-full rounded-xl border-2 border-border bg-white/70 px-4 py-3 text-base focus:outline-none focus:border-primary transition-colors"
+                            className='w-full rounded-xl border-2 border-border bg-white/70 px-4 py-3 text-base focus:outline-none focus:border-primary transition-colors'
                           />
                           {subField.state.meta.errors.length > 0 && (
-                            <p className="text-sm text-destructive">
+                            <p className='text-sm text-destructive'>
                               {subField.state.meta.errors.join(', ')}
                             </p>
                           )}
@@ -115,8 +115,8 @@ export function SetupStep() {
         ))}
 
         <button
-          type="submit"
-          className="w-full h-12 bg-primary-container text-primary-container-foreground rounded-xl font-bold text-body-lg active:scale-95 transition-all shadow-lg"
+          type='submit'
+          className='w-full h-12 bg-primary-container text-primary-container-foreground rounded-xl font-bold text-body-lg active:scale-95 transition-all shadow-lg'
         >
           Aloita peli
         </button>
