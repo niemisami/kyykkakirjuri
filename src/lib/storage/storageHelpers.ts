@@ -1,6 +1,7 @@
 type Version = `${number}`
 export const versionKey = (version: Version) => (key: string) => `v${version}:${key}`
 export const v1Key = versionKey('1') // Create more if needed
+export const v2Key = versionKey('2')
 
 /**
  * Usage `clearVersionedKeys('1', localStorage)` or `clearVersionedKeys('1', sessionStorage)`

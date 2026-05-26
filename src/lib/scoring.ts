@@ -21,25 +21,24 @@ export interface GameResult {
 }
 
 /**
- * Scores a single pelaajan heittovuoro (player throw).
+ * Scores a single karttu throw.
  * @param akat                 Kyykät remaining inside the target square
  * @param papit                Kyykät resting on the boundary line
  * @param turnIndex            1-based index of the current turn within the round
  * @param totalTurns           Total turns in the round (normally TURNS_PER_ROUND = 4)
- * @param throwIndexWithinTurn 1 = first player throw of the turn, 2 = second player throw
+ * @param singleThrowIndexWithinTurn 1..4 single-throw index within the team turn
  */
 export function scorePlayerThrow(
   akat: number,
   papit: number,
   turnIndex: number,
   totalTurns: number,
-  throwIndexWithinTurn: 1 | 2
+  singleThrowIndexWithinTurn: 1 | 2 | 3 | 4
 ): TurnResult {
   const fieldCleared = akat === 0 && papit === 0
   if(fieldCleared) {
     const remainingFullTurns = totalTurns - turnIndex
-    // When cleared on the first player throw, player 2's 2 kartut are also unused
-    const midTurnBonus = throwIndexWithinTurn === 1 ? 2 : 0
+    const midTurnBonus = 4 - singleThrowIndexWithinTurn
     const unusedKartut = midTurnBonus + remainingFullTurns * KARTUT_PER_TURN
     return { points: unusedKartut, fieldCleared: true, unusedKartut }
   }

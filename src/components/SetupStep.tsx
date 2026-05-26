@@ -25,8 +25,26 @@ const GameSetupFormSchema = z.object({
 export function SetupStep() {
   const form = useForm({
     defaultValues: {
-      teamA: { name: '', players: Array.from({ length: PLAYER_COUNT }, () => ({ name: '' })) },
-      teamB: { name: '', players: Array.from({ length: PLAYER_COUNT }, () => ({ name: '' })) },
+      // teamA: { name: '', players: Array.from({ length: PLAYER_COUNT }, () => ({ name: '' })) },
+      // teamB: { name: '', players: Array.from({ length: PLAYER_COUNT }, () => ({ name: '' })) },
+      teamA: {
+        name: 'testi',
+        players: [
+          { name: 'Sami' },
+          { name: 'Sini' },
+          { name: 'Matu' },
+          { name: 'Simo-Pekka' },
+        ],
+      },
+      teamB: {
+        name: 'testi BB',
+        players: [
+          { name: 'Katariina' },
+          { name: 'Niklas' },
+          { name: 'Jerkku' },
+          { name: 'Dille' },
+        ],
+      },
     },
     validators: { onSubmit: GameSetupFormSchema },
     onSubmit: ({ value }) => {

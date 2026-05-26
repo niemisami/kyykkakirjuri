@@ -3,7 +3,7 @@ import { scorePlayerThrow, scoreRound, TURNS_PER_ROUND } from './scoring'
 import type { TurnResult } from './scoring'
 import { deriveAkat } from './schemas'
 import type { PlayerThrowRecord } from './schemas'
-import { typedStorage, v1Key } from './storage/storageHelpers'
+import { typedStorage, v2Key } from './storage/storageHelpers'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -15,7 +15,7 @@ export interface Team {
 }
 
 export interface TurnRecord {
-  throws: [PlayerThrowRecord] | [PlayerThrowRecord, PlayerThrowRecord]
+  throws: PlayerThrowRecord[] // 1..4 single throws, truncated on field clear
   result: TurnResult // reflects state at the final throw of the turn
 }
 
@@ -42,8 +42,10 @@ export interface GameState {
   roundIndex: 0 | 1
   /** 0–7: position in the current round (even = team A, odd = team B) */
   turnIndex: number
-  /** 0 = first player throw of the current turn, 1 = second player throw */
+  /** 0 = first player in pair, 1 = second player in pair */
   playerThrowIndex: 0 | 1
+  /** 0 = first karttu by current player, 1 = second karttu by current player */
+  singleThrowIndex: 0 | 1
   fieldClearedBanner: FieldClearedBanner | null
 }
 
@@ -61,10 +63,11 @@ const initialState: GameState = {
   roundIndex: 0,
   turnIndex: 0,
   playerThrowIndex: 0,
+  singleThrowIndex: 0,
   fieldClearedBanner: null,
 }
 
-const gameStateStorage = typedStorage<GameState>(localStorage, v1Key(STORAGE_KEY), initialState)
+const gameStateStorage = typedStorage<GameState>(localStorage, v2Key(STORAGE_KEY), initialState)
 
 export const gameStore = new Store<GameState>(gameStateStorage.getData())
 gameStore.subscribe(() => gameStateStorage.persistData(gameStore.state))
@@ -146,54 +149,54 @@ export function startGame(
     roundIndex: 0,
     turnIndex: 0,
     playerThrowIndex: 0,
+    singleThrowIndex: 0,
     fieldClearedBanner: null,
   }))
 }
 
-/** Issue 4+5 / Issue 12: Record a single player throw, detect field-cleared, advance state. */
+/** Record a single karttu throw, detect field-cleared, and advance state. */
 export function recordPlayerThrow(knockedOut: number, pappiCount: number) {
   gameStore.setState((state) => {
-    const { roundIndex, turnIndex, playerThrowIndex, rounds, teams } = state
+    const { roundIndex, turnIndex, playerThrowIndex, singleThrowIndex, rounds, teams } = state
     const round = rounds[roundIndex] ?? emptyRound()
 
     const activeTeamIndex = getActiveTeamIndex(turnIndex)
     const teamTurnIndex = getTeamTurnIndex(turnIndex)
     const teamTurns = activeTeamIndex === 0 ? round.teamATurns : round.teamBTurns
 
-    // Build cumulative throw history for akat derivation
+    // Build cumulative throw history for akat derivation.
     const precedingThrows = teamTurns.flatMap(t => Array.from(t.throws))
     const currentThrow: PlayerThrowRecord = { knockedOut, pappiCount }
     const allThrows = [...precedingThrows, currentThrow]
 
     const akat = deriveAkat(allThrows)
-    const throwIndexWithinTurn = (playerThrowIndex + 1) as 1 | 2
-    const result = scorePlayerThrow(akat, pappiCount, teamTurnIndex + 1, TURNS_PER_ROUND, throwIndexWithinTurn)
+    const singleThrowIndexWithinTurn =
+      (playerThrowIndex * 2 + singleThrowIndex + 1) as 1 | 2 | 3 | 4
+    const result = scorePlayerThrow(
+      akat,
+      pappiCount,
+      teamTurnIndex + 1,
+      TURNS_PER_ROUND,
+      singleThrowIndexWithinTurn
+    )
 
     const newRound: RoundData = { ...round }
+    const turns = activeTeamIndex === 0 ? newRound.teamATurns : newRound.teamBTurns
+    const existingTurn = turns[teamTurnIndex]
+    const updatedTurnThrows = existingTurn
+      ? [...existingTurn.throws, currentThrow]
+      : [currentThrow]
+    const updatedTurn: TurnRecord = { throws: updatedTurnThrows, result }
+    const newTurns = existingTurn
+      ? [...turns.slice(0, teamTurnIndex), updatedTurn, ...turns.slice(teamTurnIndex + 1)]
+      : [...turns, updatedTurn]
 
-    if(playerThrowIndex === 0) {
-      // First player throw: push a new TurnRecord with one throw
-      const newRecord: TurnRecord = { throws: [currentThrow], result }
-      if(activeTeamIndex === 0) {
-        newRound.teamATurns = [...newRound.teamATurns, newRecord]
-        if(result.fieldCleared) newRound.teamACleared = true
-      } else {
-        newRound.teamBTurns = [...newRound.teamBTurns, newRecord]
-        if(result.fieldCleared) newRound.teamBCleared = true
-      }
+    if(activeTeamIndex === 0) {
+      newRound.teamATurns = newTurns
+      if(result.fieldCleared) newRound.teamACleared = true
     } else {
-      // Second player throw: update the last TurnRecord with the second throw
-      const turns = activeTeamIndex === 0 ? newRound.teamATurns : newRound.teamBTurns
-      const prevRecord = turns[turns.length - 1]
-      const updatedRecord: TurnRecord = { throws: [prevRecord.throws[0], currentThrow], result }
-      const newTurns = [...turns.slice(0, -1), updatedRecord]
-      if(activeTeamIndex === 0) {
-        newRound.teamATurns = newTurns
-        if(result.fieldCleared) newRound.teamACleared = true
-      } else {
-        newRound.teamBTurns = newTurns
-        if(result.fieldCleared) newRound.teamBCleared = true
-      }
+      newRound.teamBTurns = newTurns
+      if(result.fieldCleared) newRound.teamBCleared = true
     }
 
     const newRounds: [RoundData | null, RoundData | null] = [
@@ -209,12 +212,28 @@ export function recordPlayerThrow(knockedOut: number, pappiCount: number) {
       }
       : null
 
-    // After throw 1 without a clear: stay on the same turn, advance to throw 2
-    if(playerThrowIndex === 0 && !result.fieldCleared) {
-      return { ...state, rounds: newRounds, playerThrowIndex: 1, fieldClearedBanner: null }
+    if(!result.fieldCleared) {
+      if(singleThrowIndex === 0) {
+        return {
+          ...state,
+          rounds: newRounds,
+          singleThrowIndex: 1,
+          fieldClearedBanner: null,
+        }
+      }
+
+      if(playerThrowIndex === 0) {
+        return {
+          ...state,
+          rounds: newRounds,
+          playerThrowIndex: 1,
+          singleThrowIndex: 0,
+          fieldClearedBanner: null,
+        }
+      }
     }
 
-    // After throw 2 or a mid-turn field clear: finalise turn and advance
+    // After final single throw (P2-T2) or any mid-turn clear: finalise turn and advance.
     const nextTurnIndex = getNextTurnIndex(
       turnIndex,
       newRound.teamACleared,
@@ -228,6 +247,7 @@ export function recordPlayerThrow(knockedOut: number, pappiCount: number) {
         rounds: newRounds,
         turnIndex: 0,
         playerThrowIndex: 0,
+        singleThrowIndex: 0,
         fieldClearedBanner,
         phase: nextPhase,
       }
@@ -238,6 +258,7 @@ export function recordPlayerThrow(knockedOut: number, pappiCount: number) {
       rounds: newRounds,
       turnIndex: nextTurnIndex,
       playerThrowIndex: 0,
+      singleThrowIndex: 0,
       fieldClearedBanner,
     }
   })
@@ -249,7 +270,9 @@ export function editTurn(
   teamIndex: 0 | 1,
   teamTurnIndex: number,
   throw1: PlayerThrowRecord,
-  throw2?: PlayerThrowRecord
+  throw2?: PlayerThrowRecord,
+  throw3?: PlayerThrowRecord,
+  throw4?: PlayerThrowRecord
 ) {
   gameStore.setState((state) => {
     const round = state.rounds[roundIdx]
@@ -260,19 +283,26 @@ export function editTurn(
       .slice(0, teamTurnIndex)
       .flatMap(t => Array.from(t.throws))
 
-    const throws1History = [...precedingThrows, throw1]
-    const akat1 = deriveAkat(throws1History)
-    const result1 = scorePlayerThrow(akat1, throw1.pappiCount, teamTurnIndex + 1, TURNS_PER_ROUND, 1)
+    const requestedThrows = [throw1, throw2, throw3, throw4].filter(Boolean) as PlayerThrowRecord[]
+    const computedThrows: PlayerThrowRecord[] = []
+    let finalResult: TurnResult = { points: 0, fieldCleared: false, unusedKartut: 0 }
 
-    let newRecord: TurnRecord
-    if(result1.fieldCleared || !throw2) {
-      newRecord = { throws: [throw1], result: result1 }
-    } else {
-      const throws2History = [...throws1History, throw2]
-      const akat2 = deriveAkat(throws2History)
-      const result2 = scorePlayerThrow(akat2, throw2.pappiCount, teamTurnIndex + 1, TURNS_PER_ROUND, 2)
-      newRecord = { throws: [throw1, throw2], result: result2 }
+    for(let i = 0; i < requestedThrows.length; i++) {
+      const playerthrow = requestedThrows[i]
+      const history = [...precedingThrows, ...computedThrows, playerthrow]
+      const akat = deriveAkat(history)
+      const result = scorePlayerThrow(
+        akat,
+        playerthrow.pappiCount,
+        teamTurnIndex + 1,
+        TURNS_PER_ROUND,
+        (i + 1) as 1 | 2 | 3 | 4
+      )
+      computedThrows.push(playerthrow)
+      finalResult = result
+      if(result.fieldCleared) break
     }
+    const newRecord: TurnRecord = { throws: computedThrows, result: finalResult }
 
     const newRound: RoundData = { ...round }
     if(teamIndex === 0) {
@@ -301,7 +331,7 @@ export function editPlayerThrow(
   roundIdx: 0 | 1,
   teamIndex: 0 | 1,
   teamTurnIndex: number,
-  playerThrowIndex: 0 | 1,
+  playerThrowIndex: 0 | 1 | 2 | 3,
   knockedOut: number,
   pappiCount: number
 ) {
@@ -318,35 +348,29 @@ export function editPlayerThrow(
       .slice(0, teamTurnIndex)
       .flatMap(t => Array.from(t.throws))
 
-    let newRecord: TurnRecord
+    const updatedThrows = [...turnRecord.throws]
+    if(playerThrowIndex >= updatedThrows.length) return state
+    updatedThrows[playerThrowIndex] = editedThrow
 
-    if(playerThrowIndex === 0) {
-      const throw1History = [...precedingThrows, editedThrow]
-      const akat1 = deriveAkat(throw1History)
-      const result1 = scorePlayerThrow(akat1, pappiCount, teamTurnIndex + 1, TURNS_PER_ROUND, 1)
+    const recomputedThrows: PlayerThrowRecord[] = []
+    let finalResult: TurnResult = { points: 0, fieldCleared: false, unusedKartut: 0 }
 
-      if(result1.fieldCleared) {
-        // Edited throw 1 now clears: discard throw 2
-        newRecord = { throws: [editedThrow], result: result1 }
-      } else if(turnRecord.throws.length === 2) {
-        // Keep existing throw 2 but recompute its result
-        const throw2 = turnRecord.throws[1]
-        const throw2History = [...throw1History, throw2]
-        const akat2 = deriveAkat(throw2History)
-        const result2 = scorePlayerThrow(akat2, throw2.pappiCount, teamTurnIndex + 1, TURNS_PER_ROUND, 2)
-        newRecord = { throws: [editedThrow, throw2], result: result2 }
-      } else {
-        // Was a single-throw turn (mid-clear), now not cleared; keep as single throw
-        newRecord = { throws: [editedThrow], result: result1 }
-      }
-    } else {
-      // Editing throw 2
-      const throw1 = turnRecord.throws[0]
-      const throw2History = [...precedingThrows, throw1, editedThrow]
-      const akat2 = deriveAkat(throw2History)
-      const result2 = scorePlayerThrow(akat2, pappiCount, teamTurnIndex + 1, TURNS_PER_ROUND, 2)
-      newRecord = { throws: [throw1, editedThrow], result: result2 }
+    for(let i = 0; i < updatedThrows.length; i++) {
+      const playerthrow = updatedThrows[i]
+      const history = [...precedingThrows, ...recomputedThrows, playerthrow]
+      const akat = deriveAkat(history)
+      const result = scorePlayerThrow(
+        akat,
+        playerthrow.pappiCount,
+        teamTurnIndex + 1,
+        TURNS_PER_ROUND,
+        (i + 1) as 1 | 2 | 3 | 4
+      )
+      recomputedThrows.push(playerthrow)
+      finalResult = result
+      if(result.fieldCleared) break
     }
+    const newRecord: TurnRecord = { throws: recomputedThrows, result: finalResult }
 
     const newRound: RoundData = { ...round }
     if(teamIndex === 0) {
@@ -401,6 +425,7 @@ export function confirmHalftime(teamAPlayers: string[], teamBPlayers: string[]) 
     roundIndex: 1,
     turnIndex: 0,
     playerThrowIndex: 0,
+    singleThrowIndex: 0,
     fieldClearedBanner: null,
     teams: [
       { ...state.teams[0], players: teamAPlayers },

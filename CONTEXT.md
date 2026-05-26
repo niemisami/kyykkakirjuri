@@ -46,11 +46,16 @@ Finnish: Heittovuoro
 _Avoid_: "round"
 
 **Player throw**:
-One player's throwing opportunity within a turn: 2 kartut. After each player throw, the referee records (1) the **knockedOut** count — how many kyykät (of any type) left the game square during this throw — and (2) the current **pappiCount** on the boundary. The app derives akat as `40 − ΣknockedOut − pappiCount`. Field-cleared is detectable after either player throw; if it occurs after the first throw, the second player does not throw.
+One player's full throwing opportunity within a turn: 2 kartut. A player throw contains exactly 2 single throws.
 Finnish: Pelaajan heittovuoro
 
+**Single throw**:
+One individual karttu throw by a single player. The referee records one `knockedOut` delta and one `pappiCount` snapshot after each single throw.
+Finnish: Yksittäinen heitto
+_Avoid_: player throw, turn
+
 **Knocked out (poistettu)**:
-A kyykkä that has left the game square entirely during a player throw, whether it was previously inside (akka) or on the boundary (pappi). Recorded per throw as `knockedOut` — a delta of how many exited during this specific throw, not a running total. The cumulative sum across all player throws in a round, combined with the current `pappiCount`, gives: `akat = 40 − ΣknockedOut − pappiCount`.
+A kyykkä that has left the game square entirely during a single throw, whether it was previously inside (akka) or on the boundary (pappi). Recorded per single throw as `knockedOut` — a delta of how many exited during this specific throw, not a running total. The cumulative sum across all single throws in a round, combined with the current `pappiCount`, gives: `akat = 40 − ΣknockedOut − pappiCount`.
 Finnish singular: poistettu. Finnish plural / UI label: Poistot.
 _Avoid_: cleared (use "field cleared" only for the scoring event), removed
 
@@ -92,10 +97,10 @@ _Avoid_: "full clear", "bonus"
 
 ## Example dialogue
 
-> **Referee**: "They knocked out a bunch — I count 3 akat and 1 pappi left."
-> **Dev**: "So after this turn, enter akka count = 3 and pappi count = 1."
-> **Referee**: "Right. Oh wait, I miscounted — it's actually 2 akat."
-> **Dev**: "No problem — edit the turn you just recorded and change it to 2."
+> **Referee**: "First karttu: 4 flew out, and I see 1 pappi on the line."
+> **Dev**: "Record that as single throw: knockedOut = 4, pappiCount = 1."
+> **Referee**: "Second karttu by same player: 2 more flew out, now 0 papit."
+> **Dev**: "Record the next single throw. The app updates akat and score from cumulative throws."
 > **Referee**: "The next team just cleared everything on turn 3."
 > **Dev**: "Akat = 0 and papit = 0 after turn 3 of 4 — field cleared. Their round score is +4 (4 unused kartut)."
 > **Referee**: "What about that kyykkä that bounced into the middle?"

@@ -36,26 +36,26 @@ describe('scorePlayerThrow — normal scoring', () => {
   })
 })
 
-describe('scorePlayerThrow — field cleared on throw 2 (second player throw)', () => {
-  it('clearing on turn 3 of 4 yields +4 unused kartut', () => {
+describe('scorePlayerThrow — field cleared on single throw index 2', () => {
+  it('clearing on turn 3 of 4 yields +6 unused kartut', () => {
     const result = scorePlayerThrow(0, 0, 3, 4, 2)
     expect(result.fieldCleared).toBe(true)
-    expect(result.unusedKartut).toBe(4) // 1 remaining turn × 4 kartut
-    expect(result.points).toBe(4)
+    expect(result.unusedKartut).toBe(6)
+    expect(result.points).toBe(6)
   })
 
-  it('clearing on turn 1 of 4 yields +12 unused kartut', () => {
+  it('clearing on turn 1 of 4 yields +14 unused kartut', () => {
     const result = scorePlayerThrow(0, 0, 1, 4, 2)
     expect(result.fieldCleared).toBe(true)
-    expect(result.unusedKartut).toBe(12) // 3 remaining turns × 4 kartut
-    expect(result.points).toBe(12)
+    expect(result.unusedKartut).toBe(14)
+    expect(result.points).toBe(14)
   })
 
-  it('clearing on the final turn yields 0 unused kartut', () => {
+  it('clearing on the final turn yields 2 unused kartut', () => {
     const result = scorePlayerThrow(0, 0, 4, 4, 2)
     expect(result.fieldCleared).toBe(true)
-    expect(result.unusedKartut).toBe(0)
-    expect(result.points).toBe(0)
+    expect(result.unusedKartut).toBe(2)
+    expect(result.points).toBe(2)
   })
 
   it('non-zero papit alone is not a field clear', () => {
@@ -70,25 +70,25 @@ describe('scorePlayerThrow — field cleared on throw 2 (second player throw)', 
 })
 
 describe('scorePlayerThrow — field cleared on throw 1 (mid-turn bonus)', () => {
-  it('clearing on throw 1 of turn 3 of 4 yields +6 unused kartut (1 turn × 4 + 2)', () => {
+  it('clearing on throw 1 of turn 3 of 4 yields +7 unused kartut', () => {
     const result = scorePlayerThrow(0, 0, 3, 4, 1)
     expect(result.fieldCleared).toBe(true)
-    expect(result.unusedKartut).toBe(6) // 2 (player 2's kartut) + 1 remaining turn × 4
-    expect(result.points).toBe(6)
+    expect(result.unusedKartut).toBe(7)
+    expect(result.points).toBe(7)
   })
 
-  it('clearing on throw 1 of turn 1 of 4 yields +14 unused kartut (3 turns × 4 + 2)', () => {
+  it('clearing on throw 1 of turn 1 of 4 yields +15 unused kartut', () => {
     const result = scorePlayerThrow(0, 0, 1, 4, 1)
     expect(result.fieldCleared).toBe(true)
-    expect(result.unusedKartut).toBe(14) // 2 + 3 remaining turns × 4
-    expect(result.points).toBe(14)
+    expect(result.unusedKartut).toBe(15)
+    expect(result.points).toBe(15)
   })
 
-  it('clearing on throw 1 of the final turn yields +2 unused kartut (only player 2 kartut)', () => {
+  it('clearing on throw 1 of the final turn yields +3 unused kartut', () => {
     const result = scorePlayerThrow(0, 0, 4, 4, 1)
     expect(result.fieldCleared).toBe(true)
-    expect(result.unusedKartut).toBe(2) // 2 (player 2's kartut) + 0 remaining turns
-    expect(result.points).toBe(2)
+    expect(result.unusedKartut).toBe(3)
+    expect(result.points).toBe(3)
   })
 })
 
@@ -120,24 +120,24 @@ describe('scoreRound — field cleared', () => {
       scorePlayerThrow(0, 0, 3, TURNS_PER_ROUND, 2),
     ]
     const result = scoreRound(turns)
-    expect(result.points).toBe(4) // 1 remaining turn × 4 kartut
+    expect(result.points).toBe(6)
     expect(result.fieldCleared).toBe(true)
   })
 
   it('applies field-cleared bonus when field is cleared on turn 1 of 4', () => {
     const turns = [scorePlayerThrow(0, 0, 1, TURNS_PER_ROUND, 2)]
     const result = scoreRound(turns)
-    expect(result.points).toBe(12) // 3 remaining turns × 4 kartut
+    expect(result.points).toBe(14)
     expect(result.fieldCleared).toBe(true)
   })
 
   it('stops scanning at first field-cleared turn', () => {
     const turns = [
-      scorePlayerThrow(0, 0, 2, TURNS_PER_ROUND, 2), // cleared on turn 2 → +8
+      scorePlayerThrow(0, 0, 2, TURNS_PER_ROUND, 2),
       scorePlayerThrow(0, 0, 3, TURNS_PER_ROUND, 2), // this should never be used
     ]
     const result = scoreRound(turns)
-    expect(result.points).toBe(8) // (4-2)*4
+    expect(result.points).toBe(10)
     expect(result.fieldCleared).toBe(true)
   })
 })
@@ -151,7 +151,7 @@ describe('scoreRound — manual override', () => {
   })
 
   it('override takes precedence over field-cleared result', () => {
-    const turns = [scorePlayerThrow(0, 0, 1, TURNS_PER_ROUND, 2)] // would yield +12
+    const turns = [scorePlayerThrow(0, 0, 1, TURNS_PER_ROUND, 2)]
     const result = scoreRound(turns, -99)
     expect(result.points).toBe(-99)
     expect(result.fieldCleared).toBe(false)
