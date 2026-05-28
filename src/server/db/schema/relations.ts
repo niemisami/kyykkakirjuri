@@ -18,7 +18,7 @@ export const teamRelations = relations(team, ({ many }) => ({
 export const playerRelations = relations(player, ({ one, many }) => ({
   defaultTeam: one(team, {
     fields: [player.defaultTeamId],
-    references: [team.teamId],
+    references: [team.id],
   }),
   gameTeamPlayers: many(gameTeamPlayer),
   gameKyykkaScores: many(gameKyykkaScore),
@@ -31,7 +31,7 @@ export const eventRelations = relations(event, ({ many }) => ({
 export const gameRelations = relations(game, ({ one, many }) => ({
   event: one(event, {
     fields: [game.eventId],
-    references: [event.eventId],
+    references: [event.id],
   }),
   gameTeams: many(gameTeam),
   gameTeamPlayers: many(gameTeamPlayer),
@@ -41,40 +41,40 @@ export const gameRelations = relations(game, ({ one, many }) => ({
 export const gameTeamRelations = relations(gameTeam, ({ one }) => ({
   team: one(team, {
     fields: [gameTeam.teamId],
-    references: [team.teamId],
+    references: [team.id],
   }),
   game: one(game, {
     fields: [gameTeam.gameId],
-    references: [game.gameId],
+    references: [game.id],
   }),
 }))
 
 export const gameTeamPlayerRelations = relations(gameTeamPlayer, ({ one }) => ({
   team: one(team, {
     fields: [gameTeamPlayer.teamId],
-    references: [team.teamId],
+    references: [team.id],
   }),
   game: one(game, {
     fields: [gameTeamPlayer.gameId],
-    references: [game.gameId],
+    references: [game.id],
   }),
   player: one(player, {
     fields: [gameTeamPlayer.playerId],
-    references: [player.playerId],
+    references: [player.id],
   }),
 }))
 
 export const gameKyykkaScoreRelations = relations(gameKyykkaScore, ({ one }) => ({
   team: one(team, {
     fields: [gameKyykkaScore.teamId],
-    references: [team.teamId],
+    references: [team.id],
   }),
   game: one(game, {
     fields: [gameKyykkaScore.gameId],
-    references: [game.gameId],
+    references: [game.id],
   }),
   player: one(player, {
     fields: [gameKyykkaScore.playerId],
-    references: [player.playerId],
+    references: [player.id],
   }),
 }))

@@ -1,3 +1,4 @@
+export * from './auth-schema'
 export * from './team'
 export * from './player'
 export * from './event'
