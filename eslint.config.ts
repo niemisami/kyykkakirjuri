@@ -6,13 +6,6 @@ const config = defineConfig([
   stylistic.configs['recommended'],
   tanstackConfig,
   {
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.app.json', './tsconfig.node.json'],
-      },
-    },
-  },
-  {
     rules: {
       'import/no-cycle': 'off',
       'import/order': 'off',

@@ -4,3 +4,8 @@ node_modules/
 dist/
 
 stuff/
+.env
+tsconfig.tsbuildinfo
+
+# Local Netlify folder
+.netlify
