@@ -1,8 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo } from 'react'
 
 import { Button } from '@/components/ui/button'
-
-import SignOut from './SignOut'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 type ProfileUser = {
   name?: string | null
@@ -24,51 +28,12 @@ function getDisplayName(name?: string | null) {
 }
 
 export default function ProfileButton({ user, onSignOut }: ProfileButtonProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const rootRef = useRef<HTMLDivElement>(null)
-
   const displayName = useMemo(() => getDisplayName(user.name), [user.name])
   const initial = displayName.charAt(0).toUpperCase()
 
-  useEffect(() => {
-    if(!isOpen) {
-      return undefined
-    }
-
-    function onPointerDown(event: PointerEvent) {
-      if(!rootRef.current?.contains(event.target as Node)) {
-        setIsOpen(false)
-      }
-    }
-
-    function onEscape(event: KeyboardEvent) {
-      if(event.key === 'Escape') {
-        setIsOpen(false)
-      }
-    }
-
-    document.addEventListener('pointerdown', onPointerDown)
-    document.addEventListener('keydown', onEscape)
-
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown)
-      document.removeEventListener('keydown', onEscape)
-    }
-  }, [isOpen])
-
   return (
-    <div ref={rootRef} className='relative'>
-      <Button
-        type='button'
-        variant='outline'
-        size='sm'
-        aria-haspopup='menu'
-        aria-expanded={isOpen}
-        onClick={() => {
-          setIsOpen(!isOpen)
-        }}
-        className='h-10 rounded-full pl-1.5 pr-3'
-      >
+    <DropdownMenu>
+      <DropdownMenuTrigger render={<Button type='button' variant='outline' size='sm' className='h-10 rounded-full pl-1.5 pr-3' />}>
         {user.image
           ? (
             <img
@@ -83,23 +48,13 @@ export default function ProfileButton({ user, onSignOut }: ProfileButtonProps) {
             </span>
           )}
         <span className='max-w-24 truncate'>{displayName}</span>
-      </Button>
+      </DropdownMenuTrigger>
 
-      {isOpen
-        ? (
-          <div
-            role='menu'
-            className='absolute right-0 top-[calc(100%+0.5rem)] w-40 rounded-2xl border border-neutral-200 bg-white p-1.5 shadow-lg shadow-black/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-black/30'
-          >
-            <SignOut
-              onSignOut={() => {
-                setIsOpen(false)
-                onSignOut()
-              }}
-            />
-          </div>
-        )
-        : null}
-    </div>
+      <DropdownMenuContent align='end'>
+        <DropdownMenuItem onClick={onSignOut}>
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
