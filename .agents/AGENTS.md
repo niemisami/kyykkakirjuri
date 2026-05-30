@@ -4,6 +4,7 @@ Full stack web app built with PNPM, Typescript, Drizzle ORM, Better Auth, Tansta
 
 ## Rules
 
+- Always respect [package.json](./package.json) engine e.g. "pnpm" and use it for running scripts and installing dependencies.
 - [Code style](./rules/code-style.md)
 - Inline the code style rules directly in the prompt or ensure the referenced file content is provided to the model
 - When asked to write or modify code, implement the change directly in this repository using the existing stack and conventions.
