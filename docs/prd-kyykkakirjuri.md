@@ -8,7 +8,7 @@ Kyykkä referees and scorekeepers currently track scores with pen and paper duri
 
 A mobile-web app that a referee opRoundtes in the field during a live kyykkä game. It guides the referee through the full game flow: setup (team names, player order) → round 1 (recording akat and papit after each turn) → halftime (optional substitutions, side swap) → round 2 → final results. Scores are calculated automatically. The referee can edit any previously recorded turn at any time if they miscounted.
 
-The app runs entirely in the browser with no backend or persistence — one browser session equals one game.
+The app has two tiers: a **client-side game engine** (state machine, scoring, UI) that runs entirely in the browser for zero-latency live recording, and a **server-side persistence layer** (Postgres via Drizzle, Better Auth) that stores completed games and player/team history. One browser session equals one live game; the client state is persisted to `localStorage` for crash recovery within a session.
 
 ## User Stories
 
@@ -50,30 +50,42 @@ The app runs entirely in the browser with no backend or persistence — one brow
 
 Pure functions with no side effects and no framework dependencies. The interface exposes:
 
-- `scoreTurn(akat, papit, kartutUsed, totalKartut)` → `{ points, fieldCleared, unusedKartut }`
-- `scoreTurn(turns)` → `{ points, fieldCleared }` — applies field-cleared logic: if any turn in the round reached akat=0 and papit=0, the round score is `+unusedKartut` for the remaining kartut at that point; otherwise `sum(akat × −2) + sum(papit × −1)` at end of round.
-- `scoreGame(erä1, erä2)` → `{ teamA, teamB, winner }` — sums both erät per team and determines the winner (lower negative score, or field-cleared positive).
+- `scorePlayerThrow(akat, papit, turnIndex, totalTurns, singleThrowIndexWithinTurn)` → `{ points, fieldCleared, unusedKartut }` — scores a single karttu throw. Detects field-cleared (akat=0 and papit=0) and calculates the unused-karttu bonus. `singleThrowIndexWithinTurn` is 1-based, ranging 1–4 across both players in a turn.
+- `scoreRound(turns, override?)` → `{ points, fieldCleared }` — accepts an array of `TurnResult`s. If any turn cleared the field, returns that turn's `unusedKartut` as points. Otherwise returns the last turn's cumulative points. When `override` is provided, returns it directly.
+- `scoreGame(round1, round2)` → `{ teamA, teamB, winner }` — sums both erät per team and determines the winner.
 
-Penalty weights are constants: `AKKA_POINTS = -2`, `PAPPI_POINTS = -1`.
+Penalty weights are constants: `AKKA_POINTS = -2`, `PAPPI_POINTS = -1`, `KARTUT_PER_TURN = 4`, `TURNS_PER_ROUND = 4`.
 
 ### Module: Game state machine (`@tanstack/store`)
 
 Holds the single source of truth for the entire game. State shape (conceptual):
 
 ```
-GameState =
-  | { phase: 'setup' }
-  | { phase: 'round', roundIndex: 0 | 1, turnIndex: number, teams: Team[], results: TurnResult[][] }
-  | { phase: 'halftime', round1Results: RoundResult }
-  | { phase: 'finished', gameResult: GameResult }
+GameState = {
+  phase: 'setup' | 'round' | 'halftime' | 'finished'
+  teams: [Team, Team]
+  rounds: [RoundData | null, RoundData | null]
+  roundIndex: 0 | 1
+  /** 0–7: position in the current round (even = team A, odd = team B) */
+  turnIndex: number
+  /** 0 = first player in pair, 1 = second player in pair */
+  playerThrowIndex: 0 | 1
+  /** 0 = first karttu by current player, 1 = second karttu by current player */
+  singleThrowIndex: 0 | 1
+  fieldClearedBanner: FieldClearedBanner | null
+}
 ```
 
+Each `TurnRecord` stores `throws: PlayerThrowRecord[]` (1–4 single karttu throws, truncated when field-cleared) and a `result: TurnResult` reflecting state at the final throw.
+
 Actions exposed by the store:
-- `startGame(teamA, teamB)` — validates setup and transitions `setup → round`
-- `recordTurn(akat, papit)` — appends result for the active team/turn; auto-detects field cleared; auto-advances to next team or to halftime/finished
-- `editTurn(roundIndex, turnIndex, teamIndex, akat, papit)` — overwrites a previously recorded result and recalculates downstream scores
-- `overrideRoundScore(teamIndex, points)` — replaces calculated round score with a manually entered value; marks that round as overridden
-- `confirmRoundtauko(substitutions)` — applies substitutions and transitions `halftime → round` (round 2)
+- `startGame(teamAName, teamAPlayers, teamBName, teamBPlayers)` — validates setup and transitions `setup → round`
+- `recordPlayerThrow(knockedOut, pappiCount)` — records one single karttu throw; derives `akat` and cumulative `papit` from throw history; detects field-cleared; advances `singleThrowIndex → playerThrowIndex → turnIndex → phase` as appropriate
+- `editTurn(roundIdx, teamIndex, teamTurnIndex, throw1, throw2?, throw3?, throw4?)` — replaces all throws for a recorded turn and recomputes its `TurnResult`
+- `editPlayerThrow(roundIdx, teamIndex, teamTurnIndex, playerThrowIndex, knockedOut, pappiCount)` — edits a single karttu throw within a recorded turn and recomputes the `TurnResult`; truncates or restores throw 2 when a field-clear is introduced or removed
+- `overrideRoundScore(teamIndex, points)` — replaces calculated round score with a manually entered value
+- `confirmHalftime(teamAPlayers, teamBPlayers)` — applies substitutions and transitions `halftime → round` (round 2)
+- `dismissFieldClearedBanner()` — clears the banner without changing any other state
 - `resetGame()` — transitions any phase back to `setup` for a new game
 
 ### Module: Player pairing
@@ -86,8 +98,9 @@ Given a team's ordered player list (length 1-4) and a turn index (0-3), returns 
 
 ### Module: Validation schemas (Zod)
 
-- `TurnInputSchema` — `{ akat: number (0-40), papit: number (-40-40) }` with a refinement: `akat + papit ≤ 40`
-- `GameSetupSchema` — `{ teamAName: string (non-empty), teamBName: string (non-empty), teamAPlayers: string[] (length 1-4), teamBPlayers: string[] (length 1-4) }`
+- `PlayerThrowInputSchema` — `{ knockedOut: number (0–40), pappiCount: number (−40–40) }` with a refinement: `knockedOut + pappiCount ≤ 40`. Used for each single karttu throw.
+- `TurnInputSchema` — `{ akat: number (0–40), papit: number (−40–40) }` with a refinement: `akat + papit ≤ 40`. Used for turn-level override editing.
+- `GameSetupSchema` — `{ teamA: { name: string (non-empty), players: string[] (length 1–4) }, teamB: { ... } }`
 - `RoundOverrideSchema` — `{ points: number }` (integer, no bounds; allows positive for field-cleared)
 
 ### UI: Single-screen stepper
@@ -114,17 +127,19 @@ A single route at `/`. No sub-routes for game phases — all phase transitions a
 ### Scoring engine
 All scoring logic is tested exhaustively:
 - Normal round: verify that akat and papit are multiplied by the correct penalty weights and summed.
-- Field-cleared bonus: verify that when akat=0 and papit=0 after turn N, the round score equals `+(16 − N×4)`.
+- Field-cleared bonus: verify that when akat=0 and papit=0 after single throw N, the round score equals `+(remaining kartut)`.
 - Game totals: verify that round 1 + round 2 scores sum correctly for both teams.
-- Edge cases: all 40 kyykät remaining (maximum penalty), first turn clears everything (maximum bonus), exactly 40 akat + papit split.
+- Edge cases: all 40 kyykät remaining (maximum penalty), first throw clears everything (maximum bonus), exactly 40 akat + papit split.
 
 ### Game state machine
 State transition tests:
 - Setup → round transition with valid and invalid inputs.
-- turn recording advances to the correct next team.
-- After turn 4 of team B in round 1, state transitions to `halftime`.
-- After turn 4 of team B in round 2, state transitions to `finished`.
-- `editTurn` correctly overwrites a prior result and recalculates.
+- Turn recording advances to the correct next team (via `recordPlayerThrow` called per single karttu throw).
+- After both players' kartut in turn 4 of team B in round 1, state transitions to `halftime`.
+- After both players' kartut in turn 4 of team B in round 2, state transitions to `finished`.
+- Mid-turn field clear (after any single throw) skips remaining throws in the turn.
+- `editTurn` correctly replaces all throws and recomputes the `TurnResult`.
+- `editPlayerThrow` correctly edits one throw, truncates/restores the turn on field-clear boundary changes.
 - `overrideRoundScore` marks the round as overridden and uses the manual value in game totals.
 - `resetGame` returns the state to `setup`.
 
@@ -133,14 +148,15 @@ State transition tests:
 - For teams with 1-3 players, pairing degrades without throwing.
 
 ### Validation schemas
-- `TurnInputSchema` rejects akat + papit > 40.
-- `TurnInputSchema` accepts boundary values (0+0, 0+40, 40+0, 20+20).
+- `PlayerThrowInputSchema` rejects `knockedOut + pappiCount > 40`.
+- `PlayerThrowInputSchema` accepts boundary values (0+0, 0+40, 40+0, 20+20).
+- `TurnInputSchema` rejects `akat + papit > 40`.
 - `GameSetupSchema` rejects empty team names and empty player lists.
 - `RoundOverrideSchema` accepts positive integers (field-cleared scenario).
 
 ## Out of Scope
 
-- **Backend / persistence** — no server, no database, no localStorage. One browser session = one game.
+- **Backend / client-side separation** — the client-side game engine (store, scoring) runs fully in the browser; the server layer handles auth and historical persistence only. Live game state is not synced to the server during play.
 - **Kuokkavieraat tracking** — kyykkäs bouncing into the gap between target squaret are treated as cleared. See ADR-0001.
 - **Gender-specific throw lines** — the app does not track player gender or display throw distances.
 - **Avaus as a distinct event** — the mandatory opening throw is treated as part of the first turn.

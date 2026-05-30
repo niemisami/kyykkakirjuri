@@ -24,8 +24,8 @@ export type GameSetupInput = z.infer<typeof GameSetupSchema>
 // ── Issue 11: Player-throw input ─────────────────────────────────────────────
 
 export interface PlayerThrowRecord {
-  knockedOut: number // delta: exits this throw (akat or pappi)
-  pappiCount: number // snapshot: boundary count right now
+  knockedOut: number // delta: kyykät that exited the game square on this throw
+  pappiCount: number // signed delta: positive = papit created, negative = pappi struck back inside
 }
 
 /**
