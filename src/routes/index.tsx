@@ -1,4 +1,4 @@
-import AuthHeader from '@/blocks/AuthHeader'
+import AuthHeader from '@/blocks/auth/AuthHeader'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/')({

@@ -5,7 +5,7 @@ import { TurnStep } from '@/components/TurnStep'
 import { useGameStore } from '@/lib/useGameStore'
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/game')({
+export const Route = createFileRoute('/_authenticated/game')({
   component: RouteComponent,
   ssr: false,
 })

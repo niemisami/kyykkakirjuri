@@ -9,14 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as GameRouteImport } from './routes/game'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PrototypeSortableListRouteImport } from './routes/prototype.sortable-list'
+import { Route as AuthenticatedGameRouteImport } from './routes/_authenticated/game'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
-const GameRoute = GameRouteImport.update({
-  id: '/game',
-  path: '/game',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +29,11 @@ const PrototypeSortableListRoute = PrototypeSortableListRouteImport.update({
   path: '/prototype/sortable-list',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedGameRoute = AuthenticatedGameRouteImport.update({
+  id: '/game',
+  path: '/game',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -37,20 +42,21 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/game': typeof GameRoute
+  '/game': typeof AuthenticatedGameRoute
   '/prototype/sortable-list': typeof PrototypeSortableListRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/game': typeof GameRoute
+  '/game': typeof AuthenticatedGameRoute
   '/prototype/sortable-list': typeof PrototypeSortableListRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/game': typeof GameRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_authenticated/game': typeof AuthenticatedGameRoute
   '/prototype/sortable-list': typeof PrototypeSortableListRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -59,23 +65,29 @@ export interface FileRouteTypes {
   fullPaths: '/' | '/game' | '/prototype/sortable-list' | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/game' | '/prototype/sortable-list' | '/api/auth/$'
-  id: '__root__' | '/' | '/game' | '/prototype/sortable-list' | '/api/auth/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/_authenticated/game'
+    | '/prototype/sortable-list'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  GameRoute: typeof GameRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   PrototypeSortableListRoute: typeof PrototypeSortableListRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/game': {
-      id: '/game'
-      path: '/game'
-      fullPath: '/game'
-      preLoaderRoute: typeof GameRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -92,6 +104,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrototypeSortableListRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/game': {
+      id: '/_authenticated/game'
+      path: '/game'
+      fullPath: '/game'
+      preLoaderRoute: typeof AuthenticatedGameRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -102,9 +121,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedGameRoute: typeof AuthenticatedGameRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedGameRoute: AuthenticatedGameRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  GameRoute: GameRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   PrototypeSortableListRoute: PrototypeSortableListRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }

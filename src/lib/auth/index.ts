@@ -28,7 +28,7 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
   }),
-  plugins: [tanstackStartCookies(), admin()],
+  plugins: [admin(), tanstackStartCookies()],
   socialProviders: {
     google: {
       clientId: env.AUTH_GOOGLE_ID,
