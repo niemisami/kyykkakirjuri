@@ -2,8 +2,6 @@ import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { startGame } from '@/lib/gameStore'
 
-const PLAYER_COUNT = 4
-
 const GameSetupFormSchema = z.object({
   teamA: z.object({
     name: z.string().min(1, 'Joukkueen nimi ei voi olla tyhjä'),

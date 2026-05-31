@@ -1,4 +1,3 @@
-import AuthHeader from '@/blocks/auth/AuthHeader'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/')({
@@ -8,7 +7,6 @@ export const Route = createFileRoute('/')({
 function IndexPage() {
   return (
     <div>
-      <AuthHeader />
       <Outlet />
     </div>
   )

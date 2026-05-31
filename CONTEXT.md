@@ -4,7 +4,20 @@ A mobile-web scorekeeping app for referees and scorekeepers tracking a live kyyk
 
 ## Language
 
-### Equipment & field
+### Participants
+
+**Team (Joukkue)**:
+A named group of players that competes in games. Has a permanent roster of registered players. A team has a name, optional home location, description, and contact email.
+Finnish: Joukkue
+
+**Player (Pelaaja)**:
+A named individual who belongs to at most one team at a time (`teamId`). A player may be unassigned (no team). Has a name and optional email. Players on a team's roster participate in games via `gameTeamPlayer`.
+Finnish: Pelaaja
+_Avoid_: participant, thrower (use "player" in code)
+
+---
+
+
 
 **Kyykkä**:
 A cylindrical wooden piece standing in the target square. Plural: kyykät. Each target square starts with 40 kyykät. The word also refers to the game itself — context resolves the ambiguity.
