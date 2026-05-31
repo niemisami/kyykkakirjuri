@@ -11,6 +11,7 @@ import { db } from '@/server/db'
 export type Role = 'admin' | 'user'
 
 export const auth = betterAuth({
+  baseURL: env.BETTER_AUTH_URL,
   secret: env.BETTER_AUTH_SECRET,
   user: {
     additionalFields: {

@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import { createEnv } from '@t3-oss/env-core'
 import { z } from 'zod'
 
@@ -12,16 +11,19 @@ export const env = createEnv({
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     DATABASE_URL: z.url(),
     BETTER_AUTH_SECRET: z.string(),
-    VITE_BETTER_AUTH_URL: z.string(),
     AUTH_GOOGLE_ID: z.string(),
     AUTH_GOOGLE_SECRET: z.string(),
+    BETTER_AUTH_URL: z.string(),
+  },
+  clientPrefix: 'VITE_',
+  client: {
   },
   runtimeEnv: {
     ...import.meta.env,
     NODE_ENV: process.env.NODE_ENV,
     DATABASE_URL: process.env.DATABASE_URL,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
-    VITE_BETTER_AUTH_URL: process.env.VITE_BETTER_AUTH_URL,
+    BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
     AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
   },

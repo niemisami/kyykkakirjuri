@@ -10,8 +10,6 @@ export const Route = createFileRoute('/_authenticated')({
     if(!session) {
       throw redirect({ to: '/' })
     }
-
-    console.log(session)
     return { user: session.user }
   },
   errorComponent: ({ error }) => {
@@ -19,7 +17,6 @@ export const Route = createFileRoute('/_authenticated')({
       return (
         <div className='flex items-center justify-center p-12'>
           <SignInGoogle />
-          {/* <SignIn routing='hash' forceRedirectUrl={window.location.href} /> */}
         </div>
       )
     }
