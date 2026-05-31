@@ -8,6 +8,20 @@
       "when": 1779908510851,
       "tag": "0000_yielding_hardball",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780172502057,
+      "tag": "0001_tan_bug",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780243003001,
+      "tag": "0002_lazy_betty_brant",
+      "breakpoints": true
     }
   ]
 }

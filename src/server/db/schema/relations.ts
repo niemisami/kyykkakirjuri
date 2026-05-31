@@ -16,8 +16,8 @@ export const teamRelations = relations(team, ({ many }) => ({
 }))
 
 export const playerRelations = relations(player, ({ one, many }) => ({
-  defaultTeam: one(team, {
-    fields: [player.defaultTeamId],
+  team: one(team, {
+    fields: [player.teamId],
     references: [team.id],
   }),
   gameTeamPlayers: many(gameTeamPlayer),

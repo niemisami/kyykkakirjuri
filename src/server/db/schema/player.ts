@@ -7,5 +7,5 @@ export const player = pgTable('player', {
   ...baseColumns('player_id'),
   name: varchar('name', { length: 255 }).notNull(),
   email: varchar('email', { length: 255 }),
-  defaultTeamId: integer('default_team_id').notNull().references(() => team.id),
+  teamId: integer('team_id').references(() => team.id),
 })
