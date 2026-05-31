@@ -53,7 +53,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className='bg-mesh min-h-screen pb-32'>
+      <body className='bg-mesh min-h-screen'>
         {children}
         <DevTools />
         <Scripts />
