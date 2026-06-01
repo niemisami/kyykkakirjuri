@@ -9,6 +9,7 @@ import appCss from '../index.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
 import DevTools from '@/lib/tanstack/devtools'
+import { Toaster } from '@/components/ui/sonner'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -55,6 +56,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className='bg-mesh min-h-screen'>
         {children}
+        <Toaster />
         <DevTools />
         <Scripts />
       </body>
