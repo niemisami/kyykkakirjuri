@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 import { player } from '@/server/db/schema'
 
-export const createMyPlayerSchema = createInsertSchema(player, {
+export const myPlayerCreateSchema = createInsertSchema(player, {
   name: schema => schema.trim().min(1, 'Nimi on pakollinen'),
   email: z.email('Virheellinen sähköpostiosoite').trim().max(255).optional(),
 }).pick({
@@ -11,4 +11,8 @@ export const createMyPlayerSchema = createInsertSchema(player, {
   email: true,
 })
 
-export type CreateMyPlayerInput = z.infer<typeof createMyPlayerSchema>
+export type MyPlayerCreateInput = z.infer<typeof myPlayerCreateSchema>
+
+export const myPlayerUpdateSchema = myPlayerCreateSchema
+
+export type MyPlayerUpdateInput = z.infer<typeof myPlayerUpdateSchema>

@@ -1,7 +1,7 @@
 import { teamQueryOptions } from '@/features/teams/queries'
 import { updateTeam, createPlayer, removePlayerFromTeam } from '@/features/teams/mutations'
-import { teamInputSchema, createPlayerSchema } from '@/features/teams/schemas'
-import type { TeamInput, CreatePlayerInput } from '@/features/teams/schemas'
+import { playerCreateSchema, teamCreateSchema } from '@/features/teams/schemas'
+import type { TeamCreateInput, PlayerCreateInput } from '@/features/teams/schemas'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -182,7 +182,7 @@ function AddPlayerForm({
   const queryClient = useQueryClient()
 
   const addMutation = useMutation({
-    mutationFn: (data: CreatePlayerInput) => createPlayer({ data }),
+    mutationFn: (data: PlayerCreateInput) => createPlayer({ data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teams', teamId] })
       onSuccess()
@@ -196,7 +196,7 @@ function AddPlayerForm({
   const form = useForm({
     defaultValues: { name: '', email: '', teamId },
     onSubmit: async ({ value }) => {
-      const parsed = createPlayerSchema.parse(value)
+      const parsed = playerCreateSchema.parse(value)
       await addMutation.mutateAsync(parsed)
     },
   })
@@ -267,13 +267,13 @@ function TeamEditForm({
   onSuccess,
 }: {
   teamId: number
-  defaultValues: TeamInput
+  defaultValues: TeamCreateInput
   onSuccess: () => void
 }) {
   const queryClient = useQueryClient()
 
   const updateMutation = useMutation({
-    mutationFn: (data: TeamInput) => updateTeam({ data: { ...data, id: teamId } }),
+    mutationFn: (data: TeamCreateInput) => updateTeam({ data: { ...data, id: teamId } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teams', teamId] })
       queryClient.invalidateQueries({ queryKey: ['teams'] })
@@ -288,7 +288,7 @@ function TeamEditForm({
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      const parsed = teamInputSchema.parse(value)
+      const parsed = teamCreateSchema.parse(value)
       await updateMutation.mutateAsync(parsed)
     },
   })

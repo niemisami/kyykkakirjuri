@@ -4,7 +4,7 @@ import { createInsertSchema } from 'drizzle-zod'
 
 import { player, team } from '@/server/db/schema'
 
-export const teamInputSchema = createInsertSchema(team, {
+export const teamCreateSchema = createInsertSchema(team, {
   name: schema => schema.trim().min(1, 'Nimi on pakollinen'),
   home: z.string().trim().max(255).optional(),
   description: z.string().trim().optional(),
@@ -16,15 +16,13 @@ export const teamInputSchema = createInsertSchema(team, {
   contactEmail: true,
 })
 
-export const teamUpdateSchema = teamInputSchema.extend({ id: z.number() })
+export const teamUpdateSchema = teamCreateSchema.extend({ id: z.number() })
 
-export const playerInputSchema = createInsertSchema(player).pick({
+export const playerCreateSchema = createInsertSchema(player).pick({
   name: true,
   email: true,
+  teamId: true,
 })
 
-export const createPlayerSchema = playerInputSchema.extend({ teamId: z.number() })
-
-export type TeamInput = z.infer<typeof teamInputSchema>
-export type PlayerInput = z.infer<typeof playerInputSchema>
-export type CreatePlayerInput = z.infer<typeof createPlayerSchema>
+export type TeamCreateInput = z.infer<typeof teamCreateSchema>
+export type PlayerCreateInput = z.infer<typeof playerCreateSchema>

@@ -1,6 +1,6 @@
 import { createTeam } from '@/features/teams/mutations'
-import { teamInputSchema } from '@/features/teams/schemas'
-import type { TeamInput } from '@/features/teams/schemas'
+import { teamCreateSchema } from '@/features/teams/schemas'
+import type { TeamCreateInput } from '@/features/teams/schemas'
 import { Button } from '@/components/ui/button'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
@@ -27,13 +27,13 @@ function TeamForm({
   defaultValues,
   onSuccess,
 }: {
-  defaultValues?: TeamInput
+  defaultValues?: TeamCreateInput
   onSuccess: () => void
 }) {
   const queryClient = useQueryClient()
 
   const createMutation = useMutation({
-    mutationFn: (data: TeamInput) => createTeam({ data }),
+    mutationFn: (data: TeamCreateInput) => createTeam({ data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teams'] })
       onSuccess()
@@ -52,7 +52,7 @@ function TeamForm({
       contactEmail: '',
     },
     onSubmit: async ({ value }) => {
-      const parsed = teamInputSchema.parse(value)
+      const parsed = teamCreateSchema.parse(value)
       await createMutation.mutateAsync(parsed)
     },
   })

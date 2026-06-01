@@ -2,10 +2,10 @@ import { db } from '@/server/db'
 import { player, team } from '@/server/db/schema'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
-import { teamInputSchema, teamUpdateSchema, createPlayerSchema } from './schemas'
+import { teamCreateSchema, teamUpdateSchema, playerCreateSchema } from './schemas'
 
 export const createTeam = createServerFn({ method: 'POST' })
-  .inputValidator(teamInputSchema)
+  .inputValidator(teamCreateSchema)
   .handler(async ({ data }) => {
     const [created] = await db.insert(team).values({
       name: data.name,
@@ -32,7 +32,7 @@ export const updateTeam = createServerFn({ method: 'POST' })
   })
 
 export const createPlayer = createServerFn({ method: 'POST' })
-  .inputValidator(createPlayerSchema)
+  .inputValidator(playerCreateSchema)
   .handler(async ({ data }) => {
     const [created] = await db.insert(player).values({
       name: data.name,
