@@ -11,9 +11,14 @@ A named group of players that competes in games. Has a permanent roster of regis
 Finnish: Joukkue
 
 **Player (Pelaaja)**:
-A named individual who belongs to at most one team at a time (`teamId`). A player may be unassigned (no team). Has a name and optional email. Players on a team's roster participate in games via `gameTeamPlayer`.
+A named individual who belongs to at most one team at a time (`teamId`). A player may be unassigned (no team). Has a name and optional email. Players on a team's roster participate in games via `gameTeamPlayer`. A player may be optionally owned by a User via a nullable 1:1 `userId` FK — this lets a signed-in user claim their own player identity. Not all players have a linked user (roster entries added by team managers).
 Finnish: Pelaaja
 _Avoid_: participant, thrower (use "player" in code)
+
+**User (Käyttäjä)**:
+A signed-in human using the app. A user is the identity that owns teams, accesses the dashboard, and accumulates history across games. Distinct from `Pelaaja` (a roster entry) — a user may or may not also appear as a `Pelaaja` on some team. A user may optionally create and own a single Player entity (1:1 via `player.userId`). Authenticated via Better Auth (Google). Future: a user will hold one or more roles (game manager, referee, player).
+Finnish: Käyttäjä
+_Avoid_: account, member, profile (use "user" in code)
 
 ---
 
