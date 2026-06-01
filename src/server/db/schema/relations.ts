@@ -1,5 +1,6 @@
 import { relations } from 'drizzle-orm'
 
+import { user, session, account } from './auth-schema'
 import { event } from './event'
 import { game } from './game'
 import { gameKyykkaScore } from './gameKyykkaScore'
@@ -7,6 +8,15 @@ import { gameTeam } from './gameTeam'
 import { gameTeamPlayer } from './gameTeamPlayer'
 import { player } from './player'
 import { team } from './team'
+
+export const userRelations = relations(user, ({ many, one }) => ({
+  sessions: many(session),
+  accounts: many(account),
+  player: one(player, {
+    fields: [user.id],
+    references: [player.userId],
+  }),
+}))
 
 export const teamRelations = relations(team, ({ many }) => ({
   players: many(player),
@@ -19,6 +29,10 @@ export const playerRelations = relations(player, ({ one, many }) => ({
   team: one(team, {
     fields: [player.teamId],
     references: [team.id],
+  }),
+  user: one(user, {
+    fields: [player.userId],
+    references: [user.id],
   }),
   gameTeamPlayers: many(gameTeamPlayer),
   gameKyykkaScores: many(gameKyykkaScore),

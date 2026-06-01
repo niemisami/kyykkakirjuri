@@ -1,9 +1,9 @@
-import { createFileRoute, Link, redirect } from '@tanstack/react-router'
-import { BarChart3, Swords, TrendingUp, Users } from 'lucide-react'
-import { Button, buttonVariants } from '@/components/ui/button'
-import { authClient } from '@/lib/auth/authClient'
+import SignInGoogle from '@/blocks/auth/SignInGoogle'
+import { buttonVariants } from '@/components/ui/button'
 import { getSession } from '@/lib/auth/authFunctions'
 import { cn } from '@/lib/utils'
+import { createFileRoute, Link, redirect } from '@tanstack/react-router'
+import { BarChart3, Swords, TrendingUp, Users } from 'lucide-react'
 
 export const Route = createFileRoute('/')({
   beforeLoad: async () => {
@@ -26,19 +26,7 @@ function LandingPage() {
               Kyykkäkirjuri
             </span>
           </div>
-          <Button
-            type='button'
-            variant='ghost'
-            onClick={() => {
-              void authClient.signIn.social({
-                provider: 'google',
-                callbackURL: '/game',
-              })
-            }}
-            className='text-primary font-bold hover:text-primary/80'
-          >
-            Kirjaudu
-          </Button>
+          <SignInGoogle className='text-primary font-bold hover:text-primary/80' />
         </nav>
       </header>
 
