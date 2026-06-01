@@ -1,11 +1,13 @@
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 type SignInProps = {
   onSignIn: () => void
   disabled?: boolean
+  className?: string
 }
 
-export default function SignIn({ onSignIn, disabled = false }: SignInProps) {
+export default function SignIn({ onSignIn, disabled = false, className }: SignInProps) {
   return (
     <Button
       type='button'
@@ -13,9 +15,9 @@ export default function SignIn({ onSignIn, disabled = false }: SignInProps) {
       size='sm'
       onClick={onSignIn}
       disabled={disabled}
-      className='min-w-22 rounded-full px-4'
+      className={cn('min-w-22 rounded-full px-4', className)}
     >
-      Sign in
+      Kirjaudu
     </Button>
   )
 }
