@@ -73,7 +73,7 @@ function TeamForm({
             </label>
             <input
               className='w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-              value={field.state.value}
+              value={field.state.value || ''}
               onChange={e => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />
@@ -92,7 +92,7 @@ function TeamForm({
             <label className='mb-1 block text-sm font-medium'>Kotipaikka</label>
             <input
               className='w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-              value={field.state.value}
+              value={field.state.value || ''}
               onChange={e => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />
@@ -107,7 +107,7 @@ function TeamForm({
             <textarea
               className='w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
               rows={3}
-              value={field.state.value}
+              value={field.state.value || ''}
               onChange={e => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />
@@ -120,9 +120,8 @@ function TeamForm({
           <div>
             <label className='mb-1 block text-sm font-medium'>Yhteyssähköposti</label>
             <input
-              type='email'
               className='w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-              value={field.state.value}
+              value={field.state.value || ''}
               onChange={e => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />

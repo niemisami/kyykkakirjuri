@@ -1,7 +1,3 @@
-import { teamQueryOptions } from '@/features/teams/queries'
-import { updateTeam, createPlayer, removePlayerFromTeam } from '@/features/teams/mutations'
-import { playerCreateSchema, teamCreateSchema } from '@/features/teams/schemas'
-import type { TeamCreateInput, PlayerCreateInput } from '@/features/teams/schemas'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -11,10 +7,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { useSuspenseQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import type { PlayerCreateInput } from '@/features/player/schemas'
+import { initialPlayer, playerCreateSchema } from '@/features/player/schemas'
+import { createPlayer, removePlayerFromTeam, updateTeam } from '@/features/teams/mutations'
+import { teamQueryOptions } from '@/features/teams/queries'
+import type { TeamCreateInput } from '@/features/teams/schemas'
+import { teamCreateSchema } from '@/features/teams/schemas'
+import { useForm } from '@tanstack/react-form'
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 
 export const Route = createFileRoute('/_authenticated/teams/$teamId')({
@@ -52,7 +54,6 @@ function TeamDetailPage() {
   }
 
   const { team, players } = data
-
   return (
     <div className='mx-auto max-w-2xl px-4 py-8'>
       <div className='mb-4'>
@@ -176,7 +177,7 @@ function AddPlayerForm({
   teamId,
   onSuccess,
 }: {
-  teamId: number
+  teamId: number | null
   onSuccess: () => void
 }) {
   const queryClient = useQueryClient()
@@ -193,11 +194,14 @@ function AddPlayerForm({
     },
   })
 
+  const defaultValues: PlayerCreateInput = { ...initialPlayer, teamId }
   const form = useForm({
-    defaultValues: { name: '', email: '', teamId },
+    defaultValues,
     onSubmit: async ({ value }) => {
-      const parsed = playerCreateSchema.parse(value)
-      await addMutation.mutateAsync(parsed)
+      await addMutation.mutateAsync(value)
+    },
+    validators: {
+      onSubmit: playerCreateSchema,
     },
   })
 
@@ -220,7 +224,7 @@ function AddPlayerForm({
             <input
               className='w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
               placeholder='Pelaajan nimi'
-              value={field.state.value}
+              value={field.state.value || ''}
               onChange={e => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />
@@ -236,10 +240,9 @@ function AddPlayerForm({
           <div>
             <label className='mb-1 block text-sm font-medium'>Sähköposti</label>
             <input
-              type='email'
               className='w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
               placeholder='pelaaja@example.com'
-              value={field.state.value}
+              value={field.state.value || ''}
               onChange={e => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />
@@ -309,7 +312,7 @@ function TeamEditForm({
             </label>
             <input
               className='w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-              value={field.state.value}
+              value={field.state.value || ''}
               onChange={e => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />
@@ -328,7 +331,7 @@ function TeamEditForm({
             <label className='mb-1 block text-sm font-medium'>Kotipaikka</label>
             <input
               className='w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-              value={field.state.value}
+              value={field.state.value || ''}
               onChange={e => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />
@@ -343,7 +346,7 @@ function TeamEditForm({
             <textarea
               className='w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
               rows={3}
-              value={field.state.value}
+              value={field.state.value || ''}
               onChange={e => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />
@@ -356,9 +359,8 @@ function TeamEditForm({
           <div>
             <label className='mb-1 block text-sm font-medium'>Yhteyssähköposti</label>
             <input
-              type='email'
               className='w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-              value={field.state.value}
+              value={field.state.value || ''}
               onChange={e => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />

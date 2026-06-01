@@ -9,11 +9,11 @@ export const fetchTeams = createServerFn({ method: 'GET' }).handler(async () => 
 })
 
 export const fetchTeam = createServerFn({ method: 'GET' })
-  .inputValidator((teamId: number) => teamId)
-  .handler(async ({ data: teamId }) => {
+  .inputValidator((id: number) => id)
+  .handler(async ({ data: id }) => {
     const [foundTeam, players] = await Promise.all([
-      db.select().from(team).where(eq(team.id, teamId)).then(rows => rows[0] ?? null),
-      db.select().from(player).where(eq(player.teamId, teamId)).orderBy(player.name),
+      db.select().from(team).where(eq(team.id, id)).then(rows => rows[0] ?? null),
+      db.select().from(player).where(eq(player.id, id)).orderBy(player.name),
     ])
     return { team: foundTeam, players }
   })
@@ -23,8 +23,8 @@ export const teamsQueryOptions = queryOptions({
   queryFn: () => fetchTeams(),
 })
 
-export const teamQueryOptions = (teamId: number) =>
+export const teamQueryOptions = (id: number) =>
   queryOptions({
-    queryKey: ['teams', teamId],
-    queryFn: () => fetchTeam({ data: teamId }),
+    queryKey: ['teams', id],
+    queryFn: () => fetchTeam({ data: id }),
   })
