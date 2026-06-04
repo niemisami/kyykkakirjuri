@@ -288,7 +288,7 @@ export function editTurn(
       .slice(0, teamTurnIndex)
       .flatMap(t => Array.from(t.throws))
 
-    const requestedThrows = [throw1, throw2, throw3, throw4].filter(Boolean) as PlayerThrowRecord[]
+    const requestedThrows = [throw1, throw2, throw3, throw4].filter(Boolean)
     const computedThrows: PlayerThrowRecord[] = []
     let finalResult: TurnResult = { points: 0, fieldCleared: false, unusedKartut: 0 }
 
