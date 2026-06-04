@@ -10,6 +10,7 @@ import { Mail, Shield } from 'lucide-react'
 export const Route = createFileRoute('/_authenticated/players/')({
   loader: ({ context }) => context.queryClient.ensureQueryData(playersQueryOptions),
   component: PlayersPage,
+  wrapInSuspense: true,
 })
 
 function PlayerList({ players, teamsById }: { players: Player[], teamsById: Record<number, Team> }) {

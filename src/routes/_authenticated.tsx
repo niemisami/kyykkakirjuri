@@ -1,5 +1,6 @@
 import AuthHeader from '@/blocks/auth/AuthHeader'
 import SignInGoogle from '@/blocks/auth/SignInGoogle'
+import NavBar from '@/blocks/NavBar'
 import { getSession } from '@/lib/auth/authFunctions'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
@@ -29,7 +30,9 @@ export const Route = createFileRoute('/_authenticated')({
 function RouteComponent() {
   return (
     <div>
-      <AuthHeader />
+      <NavBar>
+        <AuthHeader />
+      </NavBar>
       <Outlet />
     </div>
   )
