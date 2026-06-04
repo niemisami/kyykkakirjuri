@@ -10,7 +10,7 @@ The halftime screen shown automatically after round 1 completes. The referee see
 
 **What this slice delivers end-to-end:**
 
-1. **HalftimeStep UI** — Displays each team's round 1 score (akat × −2 + papit × −1, or field-cleared bonus, or override value). Finnish heading "Erätauko".
+1. **HalftimeStep UI** — Displays each team's round 1 score (akat × -2 + papit × -1, or field-cleared bonus, or override value). Finnish heading "Erätauko".
 2. **Side-swap display** — Visually indicates that teams swap sides for round 2.
 3. **Substitutions** — For each team, an editable player list: the referee can replace any player name and reorder the playing order for round 2. Validation: 1-4 non-empty names per team.
 4. **Store: confirmHalftime** — `confirmHalftime(teamAPlayers, teamBPlayers)` updates the player rosters and transitions state from `halftime` to `round` (roundIndex: 1, turnIndex: 0).

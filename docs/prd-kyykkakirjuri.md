@@ -98,8 +98,8 @@ Given a team's ordered player list (length 1-4) and a turn index (0-3), returns 
 
 ### Module: Validation schemas (Zod)
 
-- `PlayerThrowInputSchema` — `{ knockedOut: number (0–40), pappiCount: number (−40–40) }` with a refinement: `knockedOut + pappiCount ≤ 40`. Used for each single karttu throw.
-- `TurnInputSchema` — `{ akat: number (0–40), papit: number (−40–40) }` with a refinement: `akat + papit ≤ 40`. Used for turn-level override editing.
+- `PlayerThrowInputSchema` — `{ knockedOut: number (0–40), pappiCount: number (-40–40) }` with a refinement: `knockedOut + pappiCount ≤ 40`. Used for each single karttu throw.
+- `TurnInputSchema` — `{ akat: number (0–40), papit: number (-40–40) }` with a refinement: `akat + papit ≤ 40`. Used for turn-level override editing.
 - `GameSetupSchema` — `{ teamA: { name: string (non-empty), players: string[] (length 1–4) }, teamB: { ... } }`
 - `RoundOverrideSchema` — `{ points: number }` (integer, no bounds; allows positive for field-cleared)
 
@@ -170,4 +170,4 @@ State transition tests:
 - All domain terminology in code (variable names, type names, action names) should follow the glossary in `CONTEXT.md`. Avoid English synonyms for Finnish game concepts where a canonical Finnish term exists.
 - The scoring engine is the most rules-sensitive module. When in doubt, the rules document at `docs/rules-of-kyykka.md` is the authoritative source.
 - The `overrideRoundScore` mechanism exists specifically to handle field-recording errors. It should be clearly labelled in the UI as a correction tool, not a primary input method.
-- Nurkkapappi (a kyykkä touching both the back and side boundary) is scored identically to a regular pappi (−1). No UI distinction is needed.
+- Nurkkapappi (a kyykkä touching both the back and side boundary) is scored identically to a regular pappi (-1). No UI distinction is needed.

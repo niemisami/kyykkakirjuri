@@ -73,7 +73,7 @@ Finnish: Yksittäinen heitto
 _Avoid_: player throw, turn
 
 **Knocked out (poistettu)**:
-A kyykkä that has left the game square entirely during a single throw, whether it was previously inside (akka) or on the boundary (pappi). Recorded per single throw as `knockedOut` — a delta of how many exited during this specific throw, not a running total. The cumulative sum across all single throws in a round, combined with cumulative pappi deltas, gives: `akat = 40 − ΣknockedOut − ΣpappiCount`.
+A kyykkä that has left the game square entirely during a single throw, whether it was previously inside (akka) or on the boundary (pappi). Recorded per single throw as `knockedOut` — a delta of how many exited during this specific throw, not a running total. The cumulative sum across all single throws in a round, combined with cumulative pappi deltas, gives: `akat = 40 - ΣknockedOut - ΣpappiCount`.
 Finnish singular: poistettu. Finnish plural / UI label: Poistot.
 _Avoid_: cleared (use "field cleared" only for the scoring event), removed
 
@@ -92,12 +92,12 @@ _Avoid_: break
 ### Scoring
 
 **Akka**:
-A kyykkä remaining **inside** the target square at the time of scoring. Worth **−2 points**.
+A kyykkä remaining **inside** the target square at the time of scoring. Worth **-2 points**.
 Finnish: Akka or akat for multiple
 _Avoid_: remaining piece, skittle (when scoring is involved)
 
 **Pappi**:
-A kyykkä resting on the **boundary line** of the target square at the time of scoring. Worth **−1 point**. A nurkkapappi (corner pappi) is also treated as −1 point; no distinction is made in this app.
+A kyykkä resting on the **boundary line** of the target square at the time of scoring. Worth **-1 point**. A nurkkapappi (corner pappi) is also treated as -1 point; no distinction is made in this app.
 Finnish: Pappi or papit for multiple
 _Avoid_: boundary piece, edge piece
 
@@ -107,7 +107,7 @@ Finnish UI field label: Papit
 _Avoid_: pappi snapshot, absolute pappi count
 
 **Kuokkavieras**:
-A kyykkä that has bounced into the gap between the two target squaret. Per official rules, worth −2 points. **Not tracked by this app** — see ADR-0001.
+A kyykkä that has bounced into the gap between the two target squaret. Per official rules, worth -2 points. **Not tracked by this app** — see ADR-0001.
 Finnish: Kuokkavieras
 _Avoid_: stray, gap piece (use the official term in any code comments referencing the rule)
 

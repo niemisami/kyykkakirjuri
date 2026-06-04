@@ -11,7 +11,7 @@ Introduce `PlayerThrowRecord` as the new atomic unit of recorded data, and resha
 The input model (from ADR-0004): the referee records `knockedOut` (delta — how many kyykät of any type exited the game zone this throw) and `pappiCount` (signed pappi delta for this throw). Akat is always derived:
 
 ```ts
-akat = 40 − Σ(knockedOut across all throws so far in the round) − Σ(pappiCount across all throws so far in the round)
+akat = 40 - Σ(knockedOut across all throws so far in the round) - Σ(pappiCount across all throws so far in the round)
 ```
 
 Type shapes:
@@ -19,7 +19,7 @@ Type shapes:
 ```ts
 interface PlayerThrowRecord {
   knockedOut: number   // delta: exits this throw (akat or pappi)
-  pappiCount: number   // signed delta: papit created (+) or struck back inside (−)
+  pappiCount: number   // signed delta: papit created (+) or struck back inside (-)
 }
 
 interface TurnRecord {

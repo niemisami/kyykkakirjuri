@@ -112,7 +112,7 @@ function LandingPage() {
           </div>
           <div className='mt-8 flex gap-4'>
             <div className='flex h-12 flex-1 items-center justify-center rounded-full border-2 border-primary font-bold text-primary'>
-              −
+              -
             </div>
             <div className='flex flex-[2] items-center justify-center rounded-lg border border-outline-variant/20 bg-white text-headline-md font-bold shadow-sm'>
               ERÄ 2
