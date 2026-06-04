@@ -2,7 +2,10 @@ import { createInsertSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
 import { nullableString } from '@/lib/validationUtils'
+// TODO: check if @/server code is leaked to client bundle
 import { player } from '@/server/db/schema'
+
+export type Player = typeof player.$inferSelect
 
 export const playerCreateSchema = createInsertSchema(player, {
   name: schema => schema.trim().min(1, 'Nimi on pakollinen').default(''),

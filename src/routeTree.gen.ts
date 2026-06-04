@@ -15,10 +15,14 @@ import { Route as PrototypeSortableListRouteImport } from './routes/prototype.so
 import { Route as AuthenticatedGameRouteImport } from './routes/_authenticated/game'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedTeamsRouteRouteImport } from './routes/_authenticated/teams/route'
+import { Route as AuthenticatedPlayersRouteRouteImport } from './routes/_authenticated/players/route'
 import { Route as AuthenticatedTeamsIndexRouteImport } from './routes/_authenticated/teams/index'
+import { Route as AuthenticatedPlayersIndexRouteImport } from './routes/_authenticated/players/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthenticatedTeamsNewRouteImport } from './routes/_authenticated/teams/new'
 import { Route as AuthenticatedTeamsTeamIdRouteImport } from './routes/_authenticated/teams/$teamId'
+import { Route as AuthenticatedPlayersMeRouteImport } from './routes/_authenticated/players/me'
+import { Route as AuthenticatedPlayersPlayerIdRouteImport } from './routes/_authenticated/players/$playerId'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -49,11 +53,23 @@ const AuthenticatedTeamsRouteRoute = AuthenticatedTeamsRouteRouteImport.update({
   path: '/teams',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedPlayersRouteRoute =
+  AuthenticatedPlayersRouteRouteImport.update({
+    id: '/players',
+    path: '/players',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedTeamsIndexRoute = AuthenticatedTeamsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedTeamsRouteRoute,
 } as any)
+const AuthenticatedPlayersIndexRoute =
+  AuthenticatedPlayersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPlayersRouteRoute,
+  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -70,16 +86,31 @@ const AuthenticatedTeamsTeamIdRoute =
     path: '/$teamId',
     getParentRoute: () => AuthenticatedTeamsRouteRoute,
   } as any)
+const AuthenticatedPlayersMeRoute = AuthenticatedPlayersMeRouteImport.update({
+  id: '/me',
+  path: '/me',
+  getParentRoute: () => AuthenticatedPlayersRouteRoute,
+} as any)
+const AuthenticatedPlayersPlayerIdRoute =
+  AuthenticatedPlayersPlayerIdRouteImport.update({
+    id: '/$playerId',
+    path: '/$playerId',
+    getParentRoute: () => AuthenticatedPlayersRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/players': typeof AuthenticatedPlayersRouteRouteWithChildren
   '/teams': typeof AuthenticatedTeamsRouteRouteWithChildren
   '/app': typeof AuthenticatedAppRoute
   '/game': typeof AuthenticatedGameRoute
   '/prototype/sortable-list': typeof PrototypeSortableListRoute
+  '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
+  '/players/me': typeof AuthenticatedPlayersMeRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/teams/new': typeof AuthenticatedTeamsNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/players/': typeof AuthenticatedPlayersIndexRoute
   '/teams/': typeof AuthenticatedTeamsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -87,35 +118,46 @@ export interface FileRoutesByTo {
   '/app': typeof AuthenticatedAppRoute
   '/game': typeof AuthenticatedGameRoute
   '/prototype/sortable-list': typeof PrototypeSortableListRoute
+  '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
+  '/players/me': typeof AuthenticatedPlayersMeRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/teams/new': typeof AuthenticatedTeamsNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/players': typeof AuthenticatedPlayersIndexRoute
   '/teams': typeof AuthenticatedTeamsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_authenticated/players': typeof AuthenticatedPlayersRouteRouteWithChildren
   '/_authenticated/teams': typeof AuthenticatedTeamsRouteRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/game': typeof AuthenticatedGameRoute
   '/prototype/sortable-list': typeof PrototypeSortableListRoute
+  '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
+  '/_authenticated/players/me': typeof AuthenticatedPlayersMeRoute
   '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/_authenticated/teams/new': typeof AuthenticatedTeamsNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_authenticated/players/': typeof AuthenticatedPlayersIndexRoute
   '/_authenticated/teams/': typeof AuthenticatedTeamsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/players'
     | '/teams'
     | '/app'
     | '/game'
     | '/prototype/sortable-list'
+    | '/players/$playerId'
+    | '/players/me'
     | '/teams/$teamId'
     | '/teams/new'
     | '/api/auth/$'
+    | '/players/'
     | '/teams/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -123,21 +165,28 @@ export interface FileRouteTypes {
     | '/app'
     | '/game'
     | '/prototype/sortable-list'
+    | '/players/$playerId'
+    | '/players/me'
     | '/teams/$teamId'
     | '/teams/new'
     | '/api/auth/$'
+    | '/players'
     | '/teams'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/_authenticated/players'
     | '/_authenticated/teams'
     | '/_authenticated/app'
     | '/_authenticated/game'
     | '/prototype/sortable-list'
+    | '/_authenticated/players/$playerId'
+    | '/_authenticated/players/me'
     | '/_authenticated/teams/$teamId'
     | '/_authenticated/teams/new'
     | '/api/auth/$'
+    | '/_authenticated/players/'
     | '/_authenticated/teams/'
   fileRoutesById: FileRoutesById
 }
@@ -192,12 +241,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeamsRouteRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/players': {
+      id: '/_authenticated/players'
+      path: '/players'
+      fullPath: '/players'
+      preLoaderRoute: typeof AuthenticatedPlayersRouteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/teams/': {
       id: '/_authenticated/teams/'
       path: '/'
       fullPath: '/teams/'
       preLoaderRoute: typeof AuthenticatedTeamsIndexRouteImport
       parentRoute: typeof AuthenticatedTeamsRouteRoute
+    }
+    '/_authenticated/players/': {
+      id: '/_authenticated/players/'
+      path: '/'
+      fullPath: '/players/'
+      preLoaderRoute: typeof AuthenticatedPlayersIndexRouteImport
+      parentRoute: typeof AuthenticatedPlayersRouteRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -220,8 +283,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeamsTeamIdRouteImport
       parentRoute: typeof AuthenticatedTeamsRouteRoute
     }
+    '/_authenticated/players/me': {
+      id: '/_authenticated/players/me'
+      path: '/me'
+      fullPath: '/players/me'
+      preLoaderRoute: typeof AuthenticatedPlayersMeRouteImport
+      parentRoute: typeof AuthenticatedPlayersRouteRoute
+    }
+    '/_authenticated/players/$playerId': {
+      id: '/_authenticated/players/$playerId'
+      path: '/$playerId'
+      fullPath: '/players/$playerId'
+      preLoaderRoute: typeof AuthenticatedPlayersPlayerIdRouteImport
+      parentRoute: typeof AuthenticatedPlayersRouteRoute
+    }
   }
 }
+
+interface AuthenticatedPlayersRouteRouteChildren {
+  AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRoute
+  AuthenticatedPlayersMeRoute: typeof AuthenticatedPlayersMeRoute
+  AuthenticatedPlayersIndexRoute: typeof AuthenticatedPlayersIndexRoute
+}
+
+const AuthenticatedPlayersRouteRouteChildren: AuthenticatedPlayersRouteRouteChildren =
+  {
+    AuthenticatedPlayersPlayerIdRoute: AuthenticatedPlayersPlayerIdRoute,
+    AuthenticatedPlayersMeRoute: AuthenticatedPlayersMeRoute,
+    AuthenticatedPlayersIndexRoute: AuthenticatedPlayersIndexRoute,
+  }
+
+const AuthenticatedPlayersRouteRouteWithChildren =
+  AuthenticatedPlayersRouteRoute._addFileChildren(
+    AuthenticatedPlayersRouteRouteChildren,
+  )
 
 interface AuthenticatedTeamsRouteRouteChildren {
   AuthenticatedTeamsTeamIdRoute: typeof AuthenticatedTeamsTeamIdRoute
@@ -242,12 +337,14 @@ const AuthenticatedTeamsRouteRouteWithChildren =
   )
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedPlayersRouteRoute: typeof AuthenticatedPlayersRouteRouteWithChildren
   AuthenticatedTeamsRouteRoute: typeof AuthenticatedTeamsRouteRouteWithChildren
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
   AuthenticatedGameRoute: typeof AuthenticatedGameRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedPlayersRouteRoute: AuthenticatedPlayersRouteRouteWithChildren,
   AuthenticatedTeamsRouteRoute: AuthenticatedTeamsRouteRouteWithChildren,
   AuthenticatedAppRoute: AuthenticatedAppRoute,
   AuthenticatedGameRoute: AuthenticatedGameRoute,

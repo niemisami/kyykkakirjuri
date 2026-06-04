@@ -5,12 +5,12 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/teams/')({
   loader: ({ context }) =>
-    context.queryClient.ensureQueryData(teamsQueryOptions),
+    context.queryClient.ensureQueryData(teamsQueryOptions()),
   component: TeamsPage,
 })
 
 function TeamsPage() {
-  const { data: teams } = useSuspenseQuery(teamsQueryOptions)
+  const { data: teams } = useSuspenseQuery(teamsQueryOptions())
 
   return (
     <div className='mx-auto max-w-2xl px-4 py-8'>

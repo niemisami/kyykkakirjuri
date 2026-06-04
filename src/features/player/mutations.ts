@@ -28,7 +28,7 @@ export const updateMyPlayer = createServerFn({ method: 'POST' })
     const session = await ensureSession()
     const [updated] = await db
       .update(player)
-      .set({ name: data.name, email: data.email ?? null })
+      .set({ name: data.name, email: data.email, teamId: data.teamId })
       .where(eq(player.userId, session.user.id))
       .returning()
     return updated
@@ -40,7 +40,7 @@ export const updatePlayer = createServerFn({ method: 'POST' })
     await ensureSession()
     const [updated] = await db
       .update(player)
-      .set({ name: data.name, email: data.email ?? null })
+      .set({ name: data.name, email: data.email, teamId: data.teamId })
       .where(eq(player.id, data.id))
       .returning()
     return updated

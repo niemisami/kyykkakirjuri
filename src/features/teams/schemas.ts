@@ -5,6 +5,8 @@ import { createInsertSchema } from 'drizzle-zod'
 import { team } from '@/server/db/schema'
 import { nullableString } from '@/lib/validationUtils'
 
+export type Team = typeof team.$inferSelect
+
 export const teamCreateSchema = createInsertSchema(team, {
   name: schema => schema.trim().min(1, 'Nimi on pakollinen').default(''),
   home: schema => nullableString(schema).default(''),

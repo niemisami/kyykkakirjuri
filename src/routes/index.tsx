@@ -9,7 +9,7 @@ export const Route = createFileRoute('/')({
   beforeLoad: async () => {
     const session = await getSession()
     if(session) {
-      throw redirect({ to: '/game' })
+      throw redirect({ to: '/app' })
     }
   },
   component: LandingPage,
