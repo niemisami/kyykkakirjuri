@@ -29,7 +29,7 @@ export const removeFromStorage = (storage: Storage, key: string) => {
 export const loadFromStorage = <TData>(storage: Storage, key: string, defaultData: TData): TData => {
   try {
     const raw = storage.getItem(key)
-    return raw ? JSON.parse(raw) : defaultData
+    return raw ? JSON.parse(raw) as TData : defaultData
   } catch (error) {
     console.error(error)
     return defaultData
