@@ -1,8 +1,8 @@
 import PlayerCard from '@/features/player/PlayerCard'
 import { playersQueryOptions } from '@/features/player/queries'
-import type { Player } from '@/features/player/queries'
+import type { Player } from '@/features/player/schemas'
 import { teamsQueryOptions } from '@/features/teams/queries'
-import type { Team } from '@/features/teams/queries'
+import type { Team } from '@/features/teams/schemas'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 

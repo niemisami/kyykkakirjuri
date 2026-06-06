@@ -1,8 +1,8 @@
 import NavCard from '@/components/NavCard'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Mail, Shield } from 'lucide-react'
-import type { Player } from './queries'
-import type { Team } from '../teams/queries'
+import type { Player } from './schemas'
+import type { Team } from '../teams/schemas'
 
 type Props = {
   player: Player

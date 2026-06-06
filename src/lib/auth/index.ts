@@ -1,10 +1,7 @@
 import { betterAuth } from 'better-auth'
 import { tanstackStartCookies } from 'better-auth/tanstack-start'
-
 import { admin } from 'better-auth/plugins'
-
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
-
 import { env } from '@/env'
 import { db } from '@/server/db'
 

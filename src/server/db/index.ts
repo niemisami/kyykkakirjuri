@@ -22,6 +22,7 @@ if(env.NODE_ENV !== 'production') {
   globalForDb.conn = conn
 }
 
+export type Db = typeof db
 export const db = drizzle(conn, {
   schema: schemas,
   // Keep query logging off by default to avoid noisy output.

@@ -1,10 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import type { PlayerCreateInput } from '@/features/player/schemas'
+import type { Player, PlayerCreateInput } from '@/features/player/schemas'
 import { initialPlayer, playerCreateSchema } from '@/features/player/schemas'
 import { useForm } from '@tanstack/react-form'
 import { TeamSelectInput } from '../teams/TeamSelectInput'
-import type { Player } from './queries'
 
 export function PlayerForm({
   player,
