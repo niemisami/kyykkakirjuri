@@ -34,8 +34,8 @@ function PlayerDetailPage() {
   return (
     <div className='mx-auto max-w-2xl px-4 py-8'>
       <div className='mb-4'>
-        <Link to='/app' className='text-sm text-blue-600 hover:underline'>
-          ← Etusivu
+        <Link to='/players' viewTransition className='text-sm text-blue-600 hover:underline'>
+          ← Pelaajat
         </Link>
       </div>
 
@@ -43,6 +43,7 @@ function PlayerDetailPage() {
       {player
         ? (
           <PlayerForm
+            player={player}
             defaultValues={player}
             submitLabel='Tallenna'
             onSubmit={async (value) => {

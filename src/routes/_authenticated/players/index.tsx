@@ -1,11 +1,10 @@
-import NavCard from '@/components/NavCard'
+import PlayerCard from '@/features/player/PlayerCard'
 import { playersQueryOptions } from '@/features/player/queries'
-import type { Player } from '@/features/player/schemas'
+import type { Player } from '@/features/player/queries'
 import { teamsQueryOptions } from '@/features/teams/queries'
-import type { Team } from '@/features/teams/schemas'
+import type { Team } from '@/features/teams/queries'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { Mail, Shield } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/players/')({
   loader: ({ context }) => context.queryClient.ensureQueryData(playersQueryOptions),
@@ -20,17 +19,7 @@ function PlayerList({ players, teamsById }: { players: Player[], teamsById: Reco
         const team = player.teamId ? teamsById[player.teamId] : null
         return (
           <li key={player.id}>
-            <NavCard
-              to='/players/$playerId'
-              params={{ playerId: player.id }}
-              title={player.name}
-              description={(
-                <NavCard.DescriptionTitle className='flex items-center gap-2'>
-                  <Mail className='size-3 stroke-3 text-shadow-fuchsia-950' /> {player.email || '-'}
-                  <Shield className='size-3 stroke-3 text-shadow-fuchsia-950' /> {team?.name || '-'}
-                </NavCard.DescriptionTitle>
-              )}
-            />
+            <PlayerCard player={player} team={team} />
           </li>
         )
       })}

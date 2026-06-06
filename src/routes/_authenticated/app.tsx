@@ -18,8 +18,8 @@ function AppPage() {
 
       <div className='space-y-3'>
         <NavCard to='/game' title='Peli' description='Aloita uusi kyykkapeli.' />
-        <NavCard to='/players' title='Pelaajat' description='Selaa ja hallinnoi pelaajia.' />
         <NavCard to='/teams' title='Joukkueet' description='Selaa ja hallinnoi joukkueita.' />
+        <NavCard to='/players' title='Pelaajat' description='Selaa ja hallinnoi pelaajia.' />
       </div>
 
       <div className='mt-8 border-t pt-6'>

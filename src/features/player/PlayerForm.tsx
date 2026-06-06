@@ -1,14 +1,18 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import type { PlayerCreateInput } from '@/features/player/schemas'
 import { initialPlayer, playerCreateSchema } from '@/features/player/schemas'
 import { useForm } from '@tanstack/react-form'
 import { TeamSelectInput } from '../teams/TeamSelectInput'
+import type { Player } from './queries'
 
 export function PlayerForm({
+  player,
   defaultValues = initialPlayer,
   submitLabel,
   onSubmit,
 }: {
+  player?: Player
   defaultValues?: PlayerCreateInput
   submitLabel: string
   onSubmit: (value: PlayerCreateInput) => void
@@ -29,6 +33,23 @@ export function PlayerForm({
       }}
       className='space-y-3'
     >
+      {player && (
+        <div className='flex items-center gap-3'>
+          <Avatar
+            size='lg'
+            style={{ viewTransitionName: `player-avatar-${player.id}` }}
+          >
+            <AvatarImage src={player.user?.image ?? undefined} alt={player.name} />
+            <AvatarFallback>{player.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+          </Avatar>
+          <span
+            className='text-sm font-medium'
+            style={{ viewTransitionName: `player-name-${player.id}` }}
+          >
+            {player.name}
+          </span>
+        </div>
+      )}
       <form.Field name='name'>
         {field => (
           <div>

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import { PlayerForm } from '@/features/player/PlayerForm'
 import { createMyPlayer, updateMyPlayer } from '@/features/player/mutations'
 import { myPlayerQueryOptions } from '@/features/player/queries'
+import type { Player } from '@/features/player/queries'
 import type { PlayerCreateInput, PlayerUpdateInput } from '@/features/player/schemas'
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
@@ -66,7 +67,7 @@ function CreatePlayerCard({
 function EditMyPlayerCard({
   player,
 }: {
-  player: PlayerUpdateInput
+  player: Player
 }) {
   const queryClient = useQueryClient()
   const [editing, setEditing] = useState(false)
@@ -114,6 +115,7 @@ function EditMyPlayerCard({
         </button>
       </div>
       <PlayerForm
+        player={player}
         defaultValues={player}
         submitLabel='Tallenna'
         onSubmit={async (value) => {
