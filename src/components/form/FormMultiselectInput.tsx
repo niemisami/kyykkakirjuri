@@ -130,14 +130,14 @@ export function FormSelectInput<T, TValue extends Value>({
       )}
       <MultipleSelectInput
         items={items}
-        value={value}
+        value={value as unknown as TValue[]}
         getLabel={getLabel}
         getKey={getKey}
         disabled={disabled}
         hasError={hasError}
         placeholder={placeholder}
         dropdownContent={dropdownContent}
-        onChange={onChange}
+        onChange={onChange as unknown as (value: TValue[] | []) => void}
       />
 
       {errorMessages.length > 0 && (
