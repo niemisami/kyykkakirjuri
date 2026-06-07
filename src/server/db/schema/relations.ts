@@ -16,6 +16,7 @@ export const userRelations = relations(user, ({ many, one }) => ({
     fields: [user.id],
     references: [player.userId],
   }),
+  games: many(game),
 }))
 
 export const teamRelations = relations(team, ({ many }) => ({
@@ -46,6 +47,10 @@ export const gameRelations = relations(game, ({ one, many }) => ({
   event: one(event, {
     fields: [game.eventId],
     references: [event.id],
+  }),
+  createdBy: one(user, {
+    fields: [game.createdBy],
+    references: [user.id],
   }),
   gameTeams: many(gameTeam),
   gameTeamPlayers: many(gameTeamPlayer),

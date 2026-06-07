@@ -10,5 +10,7 @@ export const gameTeamPlayer = pgTable('game_team_player', {
   teamId: integer('team_id').notNull().references(() => team.id),
   gameId: integer('game_id').notNull().references(() => game.id),
   playerId: integer('player_id').notNull().references(() => player.id),
+  /** Round in which this player participated (1 or 2). Players can be substituted at halftime. */
+  round: integer('round').notNull(),
   name: varchar('name', { length: 255 }).notNull(),
 })
