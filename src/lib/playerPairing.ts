@@ -4,7 +4,7 @@
  *        turns 1 & 3 → players[2] + players[3]
  * Degrades gracefully for teams with fewer than 4 players (indices wrap around).
  */
-export function getPlayerPair(players: string[], turnIndex: number): [string, string] {
+export function getPlayerPair<T>(players: T[], turnIndex: number): [T, T] {
   const n = players.length
   if(turnIndex === 0 || turnIndex === 2) {
     return [players[0 % n], players[1 % n]]

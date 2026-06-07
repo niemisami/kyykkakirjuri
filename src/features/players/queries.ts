@@ -1,5 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
+import z from 'zod'
 
 import { ensureSession } from '@/lib/auth/authFunctions'
 import type { Player } from './schemas'
@@ -20,8 +21,9 @@ export const fetchMyPlayer = createServerFn({ method: 'GET' })
   })
 
 export const fetchPlayers = createServerFn({ method: 'GET' })
-  .handler(async (): Promise<Player[]> => {
-    const result = await playersQuery({})
+  .inputValidator(z.object({ teamId: z.number().optional() }))
+  .handler(async ({ data }): Promise<Player[]> => {
+    const result = await playersQuery({ teamId: data.teamId })
     return result
   })
 
@@ -30,10 +32,11 @@ export const myPlayerQueryOptions = queryOptions({
   queryFn: () => fetchMyPlayer(),
 })
 
-export const playersQueryOptions = queryOptions({
-  queryKey: ['player'],
-  queryFn: () => fetchPlayers(),
-})
+export const playersQueryOptions = (teamId?: number) =>
+  queryOptions({
+    queryKey: ['players', teamId],
+    queryFn: () => fetchPlayers({ data: { teamId } }),
+  })
 
 export const playerQueryOptions = (id: number) =>
   queryOptions({

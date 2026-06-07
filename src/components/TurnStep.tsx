@@ -157,13 +157,13 @@ function RecordForm({
   precedingThrows,
 }: {
   activeTeamName: string
-  playerPair: [string, string]
+  playerPair: [{ name: string }, { name: string }]
   teamTurnIndex: number
   playerThrowIndex: 0 | 1
   singleThrowIndex: 0 | 1
   precedingThrows: PlayerThrowRecord[]
 }) {
-  const currentPlayerName = playerPair[playerThrowIndex]
+  const currentPlayerName = playerPair[playerThrowIndex].name
 
   const form = useForm({
     defaultValues: { knockedOut: 0, pappiCount: 0 },

@@ -9,9 +9,19 @@ import { typedStorage, v2Key } from './storage/storageHelpers'
 
 export type Phase = 'setup' | 'round' | 'halftime' | 'finished'
 
+export type GameMode = 'quick' | 'tracked'
+
+export interface TeamPlayer {
+  name: string
+  id?: number
+}
+
 export interface Team {
   name: string
-  players: string[]
+  teamId?: number
+  players: TeamPlayer[]
+  /** Players who participated in round 1. Captured at halftime for tracked games. */
+  round1Players?: TeamPlayer[]
 }
 
 export interface TurnRecord {
@@ -36,6 +46,9 @@ export interface FieldClearedBanner {
 
 export interface GameState {
   phase: Phase
+  mode: GameMode
+  /** Present for tracked games after the game row is created on the backend. */
+  gameId: number | null
   teams: [Team, Team]
   /** rounds[0] = round 1, rounds[1] = round 2 */
   rounds: [RoundData | null, RoundData | null]
@@ -55,6 +68,8 @@ const STORAGE_KEY = 'game-state'
 
 const initialState: GameState = {
   phase: 'setup',
+  mode: 'quick',
+  gameId: null,
   teams: [
     { name: '', players: [] },
     { name: '', players: [] },
@@ -139,15 +154,18 @@ function derivePapit(throwHistory: PlayerThrowRecord[]): number {
 /** Issue 3: Validate setup and start a game. */
 export function startGame(
   teamAName: string,
-  teamAPlayers: string[],
+  teamAPlayers: TeamPlayer[],
   teamBName: string,
-  teamBPlayers: string[]
+  teamBPlayers: TeamPlayer[],
+  options?: { mode?: GameMode, gameId?: number, teamAId?: number, teamBId?: number }
 ) {
   gameStore.setState(() => ({
     phase: 'round',
+    mode: options?.mode ?? 'quick',
+    gameId: options?.gameId ?? null,
     teams: [
-      { name: teamAName, players: teamAPlayers },
-      { name: teamBName, players: teamBPlayers },
+      { name: teamAName, players: teamAPlayers, teamId: options?.teamAId },
+      { name: teamBName, players: teamBPlayers, teamId: options?.teamBId },
     ],
     rounds: [emptyRound(), null],
     roundIndex: 0,
@@ -425,7 +443,7 @@ export function overrideRoundScore(teamIndex: 0 | 1, points: number) {
 }
 
 /** Issue 8: Update rosters and start round 2. */
-export function confirmHalftime(teamAPlayers: string[], teamBPlayers: string[]) {
+export function confirmHalftime(teamAPlayers: TeamPlayer[], teamBPlayers: TeamPlayer[]) {
   gameStore.setState(state => ({
     ...state,
     phase: 'round',
@@ -435,8 +453,8 @@ export function confirmHalftime(teamAPlayers: string[], teamBPlayers: string[]) 
     singleThrowIndex: 0,
     fieldClearedBanner: null,
     teams: [
-      { ...state.teams[0], players: teamAPlayers },
-      { ...state.teams[1], players: teamBPlayers },
+      { ...state.teams[0], players: teamAPlayers, round1Players: state.teams[0].players },
+      { ...state.teams[1], players: teamBPlayers, round1Players: state.teams[1].players },
     ],
     rounds: [state.rounds[0], emptyRound()],
   }))

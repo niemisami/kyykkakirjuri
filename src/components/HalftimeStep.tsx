@@ -38,7 +38,7 @@ export function HalftimeStep({ state }: HalftimeStepProps) {
         <ArrowLeftRight size={14} /> Joukkueet vaihtavat puolia erässä 2
       </div>
 
-      <TeamOrderForm teams={teams} />
+      <TeamOrderForm teams={teams} gameMode={state.mode} />
     </div>
   )
 }

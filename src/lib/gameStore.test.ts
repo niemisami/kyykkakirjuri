@@ -16,9 +16,9 @@ import { deriveAkat } from './schemas'
 function freshGame() {
   startGame(
     'Koti',
-    ['Alice', 'Bob', 'Carol', 'Dave'],
+    [{ name: 'Alice' }, { name: 'Bob' }, { name: 'Carol' }, { name: 'Dave' }],
     'Vieras',
-    ['Eve', 'Frank', 'Grace', 'Hank']
+    [{ name: 'Eve' }, { name: 'Frank' }, { name: 'Grace' }, { name: 'Hank' }]
   )
 }
 
@@ -158,7 +158,9 @@ describe('startGame', () => {
   it('sets team names and players', () => {
     freshGame()
     expect(gameStore.state.teams[0].name).toBe('Koti')
-    expect(gameStore.state.teams[0].players).toEqual(['Alice', 'Bob', 'Carol', 'Dave'])
+    expect(gameStore.state.teams[0].players).toEqual([
+      { name: 'Alice' }, { name: 'Bob' }, { name: 'Carol' }, { name: 'Dave' },
+    ])
     expect(gameStore.state.teams[1].name).toBe('Vieras')
   })
 

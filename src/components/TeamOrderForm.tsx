@@ -1,5 +1,10 @@
 import { confirmHalftime } from '@/lib/gameStore'
-import type { Team } from '@/lib/gameStore'
+import type { GameMode, Team } from '@/lib/gameStore'
+import { playersQueryOptions } from '@/features/players/queries'
+import { PlayerSelectInput } from '@/featureComponents/players/PlayerSelectInput'
+import { SortablePlayerItem } from '@/featureComponents/game/SortablePlayerItem'
+import { PlayerItemContent } from '@/featureComponents/game/PlayerItemContent'
+import { useQuery } from '@tanstack/react-query'
 import {
   closestCenter,
   DndContext,
@@ -28,13 +33,13 @@ import { z } from 'zod'
 const HalftimeFormSchema = z.object({
   teamA: z.object({
     players: z
-      .array(z.object({ name: z.string().min(1, 'Pelaajan nimi ei voi olla tyhjä') }))
+      .array(z.object({ name: z.string().min(1, 'Pelaajan nimi ei voi olla tyhjä'), id: z.union([z.number(), z.undefined()]) }))
       .min(1, 'Joukkueessa pitää olla vähintään 1 pelaaja')
       .max(4, 'Joukkueessa voi olla enintään 4 pelaajaa'),
   }),
   teamB: z.object({
     players: z
-      .array(z.object({ name: z.string().min(1, 'Pelaajan nimi ei voi olla tyhjä') }))
+      .array(z.object({ name: z.string().min(1, 'Pelaajan nimi ei voi olla tyhjä'), id: z.union([z.number(), z.undefined()]) }))
       .min(1, 'Joukkueessa pitää olla vähintään 1 pelaaja')
       .max(4, 'Joukkueessa voi olla enintään 4 pelaajaa'),
   }),
@@ -138,10 +143,23 @@ function SortablePlayerRow({
 
 interface TeamOrderFormProps {
   teams: [Team, Team]
+  gameMode: GameMode
 }
 
-export function TeamOrderForm({ teams }: TeamOrderFormProps) {
+export function TeamOrderForm({ teams, gameMode }: TeamOrderFormProps) {
   const [activeId, setActiveId] = useState<string | null>(null)
+  const [selectedPlayerIds, setSelectedPlayerIds] = useState<[number | null, number | null]>([null, null])
+
+  const { data: teamAPlayers = [] } = useQuery({
+    ...playersQueryOptions(teams[0].teamId),
+    enabled: gameMode === 'tracked' && teams[0].teamId !== undefined,
+  })
+  const { data: teamBPlayers = [] } = useQuery({
+    ...playersQueryOptions(teams[1].teamId),
+    enabled: gameMode === 'tracked' && teams[1].teamId !== undefined,
+  })
+  const allTeamPlayers = [teamAPlayers, teamBPlayers] as const
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(TouchSensor),
@@ -150,14 +168,14 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
 
   const form = useForm({
     defaultValues: {
-      teamA: { players: teams[0].players.map(name => ({ name })) },
-      teamB: { players: teams[1].players.map(name => ({ name })) },
+      teamA: { players: teams[0].players.map(p => ({ name: p.name, id: p.id })) },
+      teamB: { players: teams[1].players.map(p => ({ name: p.name, id: p.id })) },
     },
     validators: { onSubmit: HalftimeFormSchema },
     onSubmit: ({ value }) => {
       confirmHalftime(
-        value.teamA.players.map(p => p.name),
-        value.teamB.players.map(p => p.name)
+        value.teamA.players.map(p => ({ name: p.name, id: p.id })),
+        value.teamB.players.map(p => ({ name: p.name, id: p.id }))
       )
     },
   })
@@ -174,8 +192,11 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
       {(['teamA', 'teamB'] as const).map((teamKey, idx) => (
         <form.Field key={teamKey} name={`${teamKey}.players`} mode='array'>
           {(playersField) => {
-            const itemIds = playersField.state.value.map((item, i) => `${teamKey}-${item.name}-${i}`)
+            const itemIds = playersField.state.value.map((item, i) => `${teamKey}-${item.id ?? item.name}-${i}`)
             const activeIndex = activeId ? itemIds.indexOf(activeId) : -1
+            const excludeIds = playersField.state.value
+              .map(p => p.id)
+              .filter((id): id is number => id !== undefined)
 
             function handleDragStart(event: DragStartEvent) {
               setActiveId(event.active.id as string)
@@ -184,12 +205,24 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
             function handleDragEnd(event: DragEndEvent) {
               const { active, over } = event
               if(!over || active.id === over.id) return
-              const oldIndex = itemIds.indexOf(active.id as string)
-              const newIndex = itemIds.indexOf(over.id as string)
+              const oldIndex = itemIds.indexOf(active.id.toString())
+              const newIndex = itemIds.indexOf(over.id.toString())
               if(oldIndex !== -1 && newIndex !== -1) {
                 playersField.moveValue(oldIndex, newIndex)
               }
               setActiveId(null)
+            }
+
+            function handlePlayerSelect(id: number | null) {
+              setSelectedPlayerIds((prev) => {
+                const next = [...prev] as [number | null, number | null]
+                next[idx] = null
+                return next
+              })
+              if(!id) return
+              const player = allTeamPlayers[idx].find(p => p.id === id)
+              if(!player) return
+              playersField.pushValue({ name: player.name, id: player.id })
             }
 
             return (
@@ -207,21 +240,50 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
                   <h2 className='text-headline-md'>{teams[idx].name} - pelaajat erässä 2</h2>
 
                   <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
+                    {gameMode === 'tracked' && teams[idx].teamId !== undefined && playersField.state.value.length < 4 && (
+                      <PlayerSelectInput
+                        teamId={teams[idx].teamId}
+                        value={selectedPlayerIds[idx]}
+                        onChange={handlePlayerSelect}
+                        label='Lisää pelaaja'
+                        excludeIds={excludeIds}
+                      />
+                    )}
+                    {gameMode === 'quick' && playersField.state.value.length < 4 && (
+                      <button
+                        type='button'
+                        onClick={() => playersField.pushValue({ name: '', id: undefined })}
+                        className='text-sm font-semibold text-primary hover:text-primary/80 transition-colors'
+                      >
+                        + Lisää pelaaja
+                      </button>
+                    )}
                     <div className='space-y-3'>
                       {playersField.state.value.map((_, i) => (
-                        <form.Field key={itemIds[i]} name={`${teamKey}.players[${i}].name`}>
-                          {subField => (
-                            <SortablePlayerRow
+                        gameMode === 'tracked'
+                          ? (
+                            <SortablePlayerItem
+                              key={itemIds[i]}
                               id={itemIds[i]}
-                              index={i}
-                              value={subField.state.value}
-                              onChange={subField.handleChange}
-                              onBlur={subField.handleBlur}
-                              errors={subField.state.meta.errors.map(String)}
-                              onClear={() => subField.handleChange('')}
+                              name={playersField.state.value[i].name}
+                              onRemove={() => playersField.removeValue(i)}
                             />
-                          )}
-                        </form.Field>
+                          )
+                          : (
+                            <form.Field key={itemIds[i]} name={`${teamKey}.players[${i}].name`}>
+                              {subField => (
+                                <SortablePlayerRow
+                                  id={itemIds[i]}
+                                  index={i}
+                                  value={subField.state.value}
+                                  onChange={subField.handleChange}
+                                  onBlur={subField.handleBlur}
+                                  errors={subField.state.meta.errors.map(String)}
+                                  onClear={() => subField.handleChange('')}
+                                />
+                              )}
+                            </form.Field>
+                          )
                       ))}
                     </div>
                   </SortableContext>
@@ -231,34 +293,34 @@ export function TeamOrderForm({ teams }: TeamOrderFormProps) {
                       {playersField.state.meta.errors.join(', ')}
                     </p>
                   )}
-                  {playersField.state.value.length < 4 && (
-                    <button
-                      type='button'
-                      onClick={() => playersField.pushValue({ name: '' })}
-                      className='text-sm font-semibold text-primary hover:text-primary/80 transition-colors'
-                    >
-                      + Lisää pelaaja
-                    </button>
-                  )}
                 </section>
 
                 <DragOverlay>
                   {activeId && activeIndex !== -1
-                    ? (
-                      <div className='bg-white rounded-full'>
-                        <PlayerRowContent
-                          index={activeIndex}
-                          value={playersField.state.value[activeIndex]?.name ?? ''}
-                          onChange={() => {}}
-                          onBlur={() => {}}
-                          errors={[]}
-                          onClear={() => {}}
-                          isOverlay
-                        />
-                      </div>
-                    )
+                    ? gameMode === 'tracked'
+                      ? (
+                        <div className='bg-white rounded-xl'>
+                          <PlayerItemContent
+                            name={playersField.state.value[activeIndex]?.name ?? ''}
+                            onRemove={() => {}}
+                            isOverlay
+                          />
+                        </div>
+                      )
+                      : (
+                        <div className='bg-white rounded-full'>
+                          <PlayerRowContent
+                            index={activeIndex}
+                            value={playersField.state.value[activeIndex]?.name ?? ''}
+                            onChange={() => {}}
+                            onBlur={() => {}}
+                            errors={[]}
+                            onClear={() => {}}
+                            isOverlay
+                          />
+                        </div>
+                      )
                     : null}
-
                 </DragOverlay>
               </DndContext>
             )

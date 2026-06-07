@@ -75,7 +75,7 @@ const MultipleSelectInput = <T, TValue extends Value>({
   )
 }
 
-export function FormSelectInput<T, TValue extends Value>({
+export function FormMultiSelectInput<T, TValue extends Value>({
   items,
   getLabel,
   getKey,
@@ -89,7 +89,7 @@ export function FormSelectInput<T, TValue extends Value>({
   clearable = true,
   disabled = false,
   className,
-}: FormSelectInputProps<T, TValue>) {
+}: FormMultiSelectInputProps<T, TValue>) {
   const errorMessages = Array.isArray(error) ? error : error ? [error] : []
   const hasError = errorMessages.length > 0
 
@@ -108,7 +108,6 @@ export function FormSelectInput<T, TValue extends Value>({
         <ComboboxList>
           {(item: T) => {
             const key = getKey(item)
-            console.log(key, item)
             return (
               <ComboboxItem key={key} value={item}>
                 {getLabel(item)}
@@ -130,16 +129,15 @@ export function FormSelectInput<T, TValue extends Value>({
       )}
       <MultipleSelectInput
         items={items}
-        value={value as unknown as TValue[]}
+        value={value}
         getLabel={getLabel}
         getKey={getKey}
         disabled={disabled}
         hasError={hasError}
         placeholder={placeholder}
         dropdownContent={dropdownContent}
-        onChange={onChange as unknown as (value: TValue[] | []) => void}
+        onChange={onChange}
       />
-
       {errorMessages.length > 0 && (
         <p className='text-xs text-destructive'>{errorMessages.join(', ')}</p>
       )}

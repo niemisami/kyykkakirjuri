@@ -3,13 +3,15 @@ import type { GameState } from '@/lib/gameStore'
 import { scoreGame } from '@/lib/scoring'
 import { deriveAkat } from '@/lib/schemas'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { useMutation } from '@tanstack/react-query'
+import { finalizeGame } from '@/features/games/mutations'
 
 interface ResultsStepProps {
   state: GameState
 }
 
 export function ResultsStep({ state }: ResultsStepProps) {
-  const { teams, rounds } = state
+  const { teams, rounds, mode, gameId } = state
   const round1 = rounds[0]
   const round2 = rounds[1]
 
@@ -26,6 +28,34 @@ export function ResultsStep({ state }: ResultsStepProps) {
       : game.winner === 'teamA'
         ? `${teams[0].name} voittaa!`
         : `${teams[1].name} voittaa!`
+
+  const saveMutation = useMutation({
+    mutationFn: () => {
+      if(!gameId || !teams[0].teamId || !teams[1].teamId) {
+        throw new Error('Missing game or team IDs')
+      }
+      return finalizeGame({
+        data: {
+          gameId,
+          teams: [
+            {
+              teamId: teams[0].teamId,
+              name: teams[0].name,
+              players: teams[0].players.filter(p => p.id !== undefined) as { name: string, id: number }[],
+              round1Players: teams[0].round1Players?.filter(p => p.id !== undefined) as { name: string, id: number }[] | undefined,
+            },
+            {
+              teamId: teams[1].teamId,
+              name: teams[1].name,
+              players: teams[1].players.filter(p => p.id !== undefined) as { name: string, id: number }[],
+              round1Players: teams[1].round1Players?.filter(p => p.id !== undefined) as { name: string, id: number }[] | undefined,
+            },
+          ],
+          rounds: [rounds[0] ?? null, rounds[1] ?? null],
+        },
+      })
+    },
+  })
 
   return (
     <div className='mx-auto max-w-150 px-4 pt-20 pb-8 space-y-6'>
@@ -132,6 +162,27 @@ export function ResultsStep({ state }: ResultsStepProps) {
           })}
         </div>
       </section>
+
+      {mode === 'tracked' && (
+        <section className='glass-panel rounded-2xl p-5 shadow-sm'>
+          {saveMutation.isSuccess
+            ? <p className='text-center text-sm font-semibold text-primary'>✓ Peli tallennettu</p>
+            : (
+              <>
+                {saveMutation.isError && (
+                  <p className='text-sm text-destructive text-center mb-3'>Tallennus epäonnistui. Yritä uudelleen.</p>
+                )}
+                <button
+                  onClick={() => saveMutation.mutate()}
+                  disabled={saveMutation.isPending}
+                  className='w-full h-12 bg-primary text-primary-foreground rounded-xl font-bold text-body-lg active:scale-95 transition-all shadow-lg disabled:opacity-60'
+                >
+                  {saveMutation.isPending ? 'Tallennetaan…' : 'Tallenna peli'}
+                </button>
+              </>
+            )}
+        </section>
+      )}
 
       <button
         onClick={resetGame}
