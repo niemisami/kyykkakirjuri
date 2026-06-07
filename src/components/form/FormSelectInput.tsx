@@ -9,7 +9,9 @@ import {
   ComboboxValue,
 } from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
+import { XIcon } from 'lucide-react'
 import { Button } from '../ui/button'
+import { Item, ItemActions } from '../ui/item'
 
 type Value = string | number | null
 
@@ -85,8 +87,16 @@ export function FormSelectInput<T, TValue extends Value>({
 
   const dropdownContent = (
     <>
-      <ComboboxTrigger render={<Button variant='outline' className='w-64 justify-between font-normal' />}>
-        {renderItem && selection ? renderItem(selection) : <ComboboxValue />}
+      <ComboboxTrigger render={(
+        <Button
+          variant='outline'
+          className='w-64 justify-between font-normal'
+        />
+      )}
+      >
+        {selection
+          ? <ComboboxValue />
+          : loading ? 'Ladataan…' : placeholder}
       </ComboboxTrigger>
       <ComboboxContent>
         <ComboboxInput
@@ -131,6 +141,25 @@ export function FormSelectInput<T, TValue extends Value>({
         onChange={onChange}
         clearable={clearable}
       />
+      {renderItem && selection && (
+        <Item size='sm' className='max-w-xs' variant='outline'>
+          {renderItem(selection)}
+          {clearable && !disabled && (
+            <ItemActions>
+              <Button
+                type='button'
+                variant='ghost'
+                size='icon-xs'
+                onClick={() => onChange(null)}
+                aria-label='Clear selection'
+              >
+                <XIcon />
+              </Button>
+            </ItemActions>
+          )}
+
+        </Item>
+      )}
       {errorMessages.length > 0 && (
         <p className='text-xs text-destructive'>{errorMessages.join(', ')}</p>
       )}

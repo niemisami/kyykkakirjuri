@@ -1,7 +1,7 @@
-import { useQuery } from '@tanstack/react-query'
 import { FormSelectInput } from '@/components/form/FormSelectInput'
 import { teamsQueryOptions } from '@/features/teams/queries'
 import type { Team } from '@/features/teams/schemas'
+import { useQuery } from '@tanstack/react-query'
 import TeamItem from './details/Item'
 
 type BaseProps = {
@@ -31,7 +31,9 @@ export function TeamSelectInput(props: TeamSelectInputProps) {
   return (
     <FormSelectInput
       {...rest}
+      placeholder='Valitse joukkue'
       items={teams}
+      clearable
       getLabel={t => t.name}
       getKey={t => t?.id}
       renderItem={team => <TeamItem team={team} />}
