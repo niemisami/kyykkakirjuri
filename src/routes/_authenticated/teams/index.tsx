@@ -1,5 +1,8 @@
 import { buttonVariants } from '@/components/ui/button'
+import { ItemGroup } from '@/components/ui/item'
+import TeamCard from '@/featureComponents/teams/TeamCard'
 import { teamsQueryOptions } from '@/features/teams/queries'
+import type { Team } from '@/features/teams/schemas'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
@@ -7,7 +10,18 @@ export const Route = createFileRoute('/_authenticated/teams/')({
   loader: ({ context }) =>
     context.queryClient.ensureQueryData(teamsQueryOptions()),
   component: TeamsPage,
+  wrapInSuspense: true,
 })
+
+function TeamList({ teams }: { teams: Team[] }) {
+  return (
+    <ItemGroup>
+      {teams.map(team => (
+        <TeamCard key={team.id} team={team} />
+      ))}
+    </ItemGroup>
+  )
+}
 
 function TeamsPage() {
   const { data: teams } = useSuspenseQuery(teamsQueryOptions())
@@ -29,22 +43,7 @@ function TeamsPage() {
           <p className='text-muted-foreground text-sm'>Ei joukkueita vielä.</p>
         )
         : (
-          <ul className='space-y-2'>
-            {teams.map(team => (
-              <li key={team.id}>
-                <Link
-                  to='/teams/$teamId'
-                  params={{ teamId: team.id }}
-                  className='block rounded-lg border p-4 hover:bg-neutral-50 dark:hover:bg-neutral-900'
-                >
-                  <p className='font-medium'>{team.name}</p>
-                  {team.home && (
-                    <p className='text-muted-foreground text-sm'>{team.home}</p>
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <TeamList teams={teams} />
         )}
     </div>
   )

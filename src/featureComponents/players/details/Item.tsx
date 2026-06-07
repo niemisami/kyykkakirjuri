@@ -1,4 +1,4 @@
-import { Mail, Plus, Shield } from 'lucide-react'
+import { Mail, Shield } from 'lucide-react'
 
 import Description from '@/components/typography/Description'
 import Title from '@/components/typography/Title'
@@ -7,7 +7,6 @@ import {
   AvatarFallback,
   AvatarImage,
 } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
 import {
   ItemActions,
   ItemContent,
@@ -40,14 +39,7 @@ function PlayerItem({ player, team, actions }: Props) {
       </ItemContent>
       {actions && (
         <ItemActions>
-          <Button
-            size='icon-sm'
-            variant='outline'
-            className='rounded-full'
-            aria-label='Invite'
-          >
-            <Plus />
-          </Button>
+          {actions}
         </ItemActions>
       )}
     </>

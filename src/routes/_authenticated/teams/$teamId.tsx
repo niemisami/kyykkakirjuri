@@ -7,12 +7,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Item, ItemGroup } from '@/components/ui/item'
 import type { PlayerCreateInput } from '@/features/players/schemas'
 import { initialPlayer, playerCreateSchema } from '@/features/players/schemas'
 import { createPlayer, removePlayerFromTeam, updateTeam } from '@/features/teams/mutations'
 import { teamQueryOptions } from '@/features/teams/queries'
 import type { TeamCreateInput } from '@/features/teams/schemas'
 import { teamCreateSchema } from '@/features/teams/schemas'
+import PlayerItem from '@/featureComponents/players/details/Item'
 import { useForm } from '@tanstack/react-form'
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
@@ -122,24 +124,26 @@ function TeamDetailPage() {
           <p className='text-muted-foreground text-sm'>Ei pelaajia.</p>
         )
         : (
-          <ul className='space-y-2'>
+          <ItemGroup>
             {players.map(p => (
-              <li key={p.id} className='flex items-center justify-between rounded-lg border px-4 py-3 text-sm'>
-                <div>
-                  <p className='font-medium'>{p.name}</p>
-                  {p.email && <p className='text-muted-foreground'>{p.email}</p>}
-                </div>
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  className='text-destructive hover:text-destructive'
-                  onClick={() => setPlayerToRemove({ id: p.id, name: p.name })}
-                >
-                  Poista
-                </Button>
-              </li>
+              <Item key={p.id} variant='outline'>
+                <PlayerItem
+                  player={p}
+                  team={team}
+                  actions={(
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      className='text-destructive hover:text-destructive'
+                      onClick={() => setPlayerToRemove({ id: p.id, name: p.name })}
+                    >
+                      Poista
+                    </Button>
+                  )}
+                />
+              </Item>
             ))}
-          </ul>
+          </ItemGroup>
         )}
 
       <Dialog
