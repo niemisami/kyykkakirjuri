@@ -1,6 +1,6 @@
 import NavCard from '@/components/NavCard'
 import { buttonVariants } from '@/components/ui/button'
-import { myPlayerQueryOptions } from '@/features/player/queries'
+import { myPlayerQueryOptions } from '@/features/players/queries'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 

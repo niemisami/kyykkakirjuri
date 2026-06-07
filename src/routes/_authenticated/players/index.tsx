@@ -1,6 +1,7 @@
-import PlayerCard from '@/features/player/PlayerCard'
-import { playersQueryOptions } from '@/features/player/queries'
-import type { Player } from '@/features/player/schemas'
+import { ItemGroup } from '@/components/ui/item'
+import PlayerCard from '@/featureComponents/players/PlayerCard'
+import { playersQueryOptions } from '@/features/players/queries'
+import type { Player } from '@/features/players/schemas'
 import { teamsQueryOptions } from '@/features/teams/queries'
 import type { Team } from '@/features/teams/schemas'
 import { useSuspenseQuery } from '@tanstack/react-query'
@@ -14,16 +15,14 @@ export const Route = createFileRoute('/_authenticated/players/')({
 
 function PlayerList({ players, teamsById }: { players: Player[], teamsById: Record<number, Team> }) {
   return (
-    <ul className='space-y-2'>
+    <ItemGroup>
       {players.map((player) => {
         const team = player.teamId ? teamsById[player.teamId] : null
         return (
-          <li key={player.id}>
-            <PlayerCard player={player} team={team} />
-          </li>
+          <PlayerCard key={player.id} player={player} team={team} />
         )
       })}
-    </ul>
+    </ItemGroup>
   )
 }
 

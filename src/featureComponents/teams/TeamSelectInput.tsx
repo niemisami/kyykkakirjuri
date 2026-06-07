@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { FormSelectInput } from '@/components/form/FormSelectInput'
 import { teamsQueryOptions } from '@/features/teams/queries'
-import type { Team } from './schemas'
+import type { Team } from '@/features/teams/schemas'
 
 type BaseProps = {
   label?: string

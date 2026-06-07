@@ -3,7 +3,7 @@ import { createServerFn } from '@tanstack/react-start'
 
 import { ensureSession } from '@/lib/auth/authFunctions'
 import type { Player } from './schemas'
-import { playerQuery, playersQuery } from './helpers.server'
+import { playerQuery, playersQuery } from './service.server'
 
 export const fetchPlayer = createServerFn({ method: 'GET' })
   .inputValidator((id: number) => id)

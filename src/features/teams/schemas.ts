@@ -5,7 +5,7 @@ import { createInsertSchema } from 'drizzle-zod'
 import { team } from '@/server/db/schema'
 import { nullableString } from '@/lib/validationUtils'
 
-export type { Team } from './helpers.server'
+export type { Team } from './service.server'
 
 export const teamCreateSchema = createInsertSchema(team, {
   name: schema => schema.trim().min(1, 'Nimi on pakollinen').default(''),

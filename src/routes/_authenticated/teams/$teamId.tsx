@@ -7,8 +7,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import type { PlayerCreateInput } from '@/features/player/schemas'
-import { initialPlayer, playerCreateSchema } from '@/features/player/schemas'
+import type { PlayerCreateInput } from '@/features/players/schemas'
+import { initialPlayer, playerCreateSchema } from '@/features/players/schemas'
 import { createPlayer, removePlayerFromTeam, updateTeam } from '@/features/teams/mutations'
 import { teamQueryOptions } from '@/features/teams/queries'
 import type { TeamCreateInput } from '@/features/teams/schemas'

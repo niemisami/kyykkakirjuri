@@ -1,10 +1,10 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import z from 'zod'
-import { teamQuery, teamsQuery } from './helpers.server'
-import type { Team } from './helpers.server'
-import { playersQuery } from '../player/helpers.server'
-import type { Player } from '../player/schemas'
+import { teamQuery, teamsQuery } from './service.server'
+import type { Team } from './service.server'
+import { playersQuery } from '../players/service.server'
+import type { Player } from '../players/schemas'
 
 export const fetchTeam = createServerFn({ method: 'GET' })
   .inputValidator((id: number) => id)

@@ -3,7 +3,7 @@ import { player, team } from '@/server/db/schema'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { teamCreateSchema, teamUpdateSchema } from './schemas'
-import { playerCreateSchema } from '../player/schemas'
+import { playerCreateSchema } from '../players/schemas'
 
 export const createTeam = createServerFn({ method: 'POST' })
   .inputValidator(teamCreateSchema)
