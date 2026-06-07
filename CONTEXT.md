@@ -22,6 +22,18 @@ _Avoid_: account, member, profile (use "user" in code)
 
 ---
 
+**Quick Game (Pikapeli)**:
+A game played without database persistence. Teams and players are entered as free text. No game record is created in the backend.
+Finnish: Pikapeli
+_Avoid_: anonymous game, offline game
+
+**Tracked Game (Kirjattu peli)**:
+A game whose result is persisted to the database. Teams and players are selected from existing database records. A game row is created when the game starts and finalised when it ends.
+Finnish: Kirjattu peli
+_Avoid_: saved game, recorded game
+
+---
+
 
 
 **Kyykkä**:
