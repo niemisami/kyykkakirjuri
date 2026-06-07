@@ -18,6 +18,8 @@ export type SelectBaseProps<T, TValue extends Value> = {
   /** Maps an item to the string shown in the input and dropdown. */
   getLabel: (item: T) => string
   getKey: (item: T | null) => TValue | null | undefined
+  /** Custom renderer for each item in the dropdown list and the selected trigger value. */
+  renderItem?: (item: T) => React.ReactNode
   label?: string
   required?: boolean
   /** Error message(s) shown below the input. */
@@ -65,6 +67,7 @@ export function FormSelectInput<T, TValue extends Value>({
   items,
   getLabel,
   getKey,
+  renderItem,
   value,
   onChange,
   label,
@@ -78,11 +81,12 @@ export function FormSelectInput<T, TValue extends Value>({
 }: FormSelectInputProps<T, TValue>) {
   const errorMessages = Array.isArray(error) ? error : error ? [error] : []
   const hasError = errorMessages.length > 0
+  const selection = items.find(item => getKey(item) === value) || null
 
   const dropdownContent = (
     <>
       <ComboboxTrigger render={<Button variant='outline' className='w-64 justify-between font-normal' />}>
-        <ComboboxValue />
+        {renderItem && selection ? renderItem(selection) : <ComboboxValue />}
       </ComboboxTrigger>
       <ComboboxContent>
         <ComboboxInput
@@ -96,10 +100,9 @@ export function FormSelectInput<T, TValue extends Value>({
         <ComboboxList>
           {(item: T) => {
             const key = getKey(item)
-            console.log(key, item)
             return (
               <ComboboxItem key={key} value={item}>
-                {getLabel(item)}
+                {renderItem ? renderItem(item) : getLabel(item)}
               </ComboboxItem>
             )
           }}
