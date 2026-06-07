@@ -1,27 +1,32 @@
-import { cn } from '@/lib/utils'
-import { Link } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
+import Description from './typography/Description'
+import Title from './typography/Title'
+import { Item, ItemContent } from './ui/item'
 
-type Props = {
-  title: ReactNode
-  description?: ReactNode
-} & LinkProps
+type Props = Omit<LinkProps, 'children'> & (
+  {
+    title: ReactNode
+    description?: ReactNode
+    children?: never
+  } | {
+    children: ReactNode
+    title?: never
+    description?: never
+  }
+)
 
 function NavCard({
   to,
   params,
+  children,
   title,
   description,
   ...linkProps
 }: Props) {
-  return (
-    <Link
-      to={to}
-      params={params ?? undefined}
-      className='block rounded-lg border px-4 py-3 hover:bg-neutral-50 dark:hover:bg-neutral-900'
-      {...linkProps}
-    >
+  const content = children || (
+    <ItemContent>
       {title
         ? typeof title === 'string'
           ? <NavCard.Title>{title}</NavCard.Title>
@@ -32,22 +37,26 @@ function NavCard({
           ? <NavCard.DescriptionTitle>{description}</NavCard.DescriptionTitle>
           : description
         : null}
-    </Link>
+    </ItemContent>
+  )
+
+  return (
+    <Item
+      variant='outline'
+      {...linkProps}
+      render={(
+        <Link
+          params={params ?? undefined}
+          to={to}
+        />
+      )}
+    >
+      {content}
+    </Item>
   )
 }
 
-function NavCardTitle({ children, className }: { children: ReactNode, className?: string }) {
-  return (
-    <p className={cn('font-medium', className)}>{children}</p>
-  )
-}
-function NavCardDescriptionTitle({ children, className }: { children: ReactNode, className?: string }) {
-  return (
-    <p className={cn('text-muted-foreground text-sm', className)}>{children}</p>
-  )
-}
-
-NavCard.Title = NavCardTitle
-NavCard.DescriptionTitle = NavCardDescriptionTitle
+NavCard.Title = Title
+NavCard.DescriptionTitle = Description
 
 export default NavCard
