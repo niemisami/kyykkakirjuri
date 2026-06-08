@@ -1,3 +1,4 @@
+import { LinkButton } from '@/components/LinkButton'
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -15,7 +16,7 @@ type NavRoute = {
 
 const TOP_ROUTES: NavRoute[] = [
   { to: '/app', label: 'Etusivu' },
-  { to: '/game', label: 'Peli' },
+  { to: '/games', label: 'Pelit' },
   { to: '/players', label: 'Pelaajat' },
   { to: '/teams', label: 'Joukkueet' },
 ]
@@ -37,6 +38,13 @@ export default function NavBar({ children }: NavBarProps) {
           </Link>
           <NavigationMenu>
             <NavigationMenuList>
+              <NavigationMenuItem className='mx-3'>
+                <LinkButton
+                  to='/games/new'
+                >
+                  Aloita peli
+                </LinkButton>
+              </NavigationMenuItem>
               {TOP_ROUTES.map(({ to, label }) => (
                 <NavigationMenuItem key={to}>
                   <NavigationMenuLink
