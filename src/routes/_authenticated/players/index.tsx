@@ -8,7 +8,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/players/')({
-  loader: ({ context }) => context.queryClient.ensureQueryData(playersQueryOptions),
+  loader: ({ context }) => context.queryClient.ensureQueryData(playersQueryOptions()),
   component: PlayersPage,
   wrapInSuspense: true,
 })
@@ -27,7 +27,7 @@ function PlayerList({ players, teamsById }: { players: Player[], teamsById: Reco
 }
 
 function PlayersPage() {
-  const { data: players } = useSuspenseQuery(playersQueryOptions)
+  const { data: players } = useSuspenseQuery(playersQueryOptions())
 
   const teamIds = players.map(p => p.teamId).filter((id): id is number => id !== null)
   const { data: teams } = useSuspenseQuery(teamsQueryOptions(teamIds))

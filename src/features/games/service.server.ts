@@ -2,7 +2,7 @@ import { db } from '@/server/db'
 import { game, gameKyykkaScore, gameTeam, gameTeamPlayer } from '@/server/db/schema'
 import { getPlayerPair } from '@/lib/playerPairing'
 import type { RoundData, TeamPlayer } from '@/lib/gameStore'
-import { eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 
 export type CreatedGame = Exclude<Awaited<ReturnType<typeof createGameRecord>>, null>
 
@@ -93,4 +93,76 @@ export const finalizeGameRecord = async ({ gameId, teams, rounds }: FinalizeGame
   if(scoreRows.length > 0) {
     await db.insert(gameKyykkaScore).values(scoreRows)
   }
+}
+
+export type Game = Awaited<ReturnType<typeof gamesQuery>>[number]
+
+export type PlayerStats = {
+  playerId: number
+  name: string
+  totalKnockedOut: number
+}
+
+export type GameTeamWithStats = {
+  id: number
+  teamId: number
+  name: string
+  totalScore: number
+  players: PlayerStats[]
+}
+
+export type GameWithTeams = {
+  game: NonNullable<Awaited<ReturnType<typeof gameQuery>>>['game']
+  teams: GameTeamWithStats[]
+}
+
+export const gamesQuery = async () => {
+  return db.query.game.findMany({
+    orderBy: [desc(game.startedAt)],
+  })
+}
+
+export const gameQuery = async ({ id }: { id: number }) => {
+  const foundGame = await db.query.game.findFirst({
+    where: eq(game.id, id),
+  })
+  if(!foundGame) return null
+
+  const [teams, players, scores] = await Promise.all([
+    db.select().from(gameTeam).where(eq(gameTeam.gameId, id)),
+    db.select().from(gameTeamPlayer).where(eq(gameTeamPlayer.gameId, id)),
+    db.select().from(gameKyykkaScore).where(eq(gameKyykkaScore.gameId, id)),
+  ])
+
+  const teamsWithStats: GameTeamWithStats[] = teams.map((t) => {
+    const teamPlayers = players.filter(p => p.teamId === t.teamId)
+    const uniquePlayers = new Map<number, string>()
+    for(const p of teamPlayers) {
+      uniquePlayers.set(p.playerId, p.name)
+    }
+
+    const teamScores = scores.filter(s => s.teamId === t.teamId)
+    const scoreByPlayer = new Map<number, number>()
+    for(const s of teamScores) {
+      scoreByPlayer.set(s.playerId, (scoreByPlayer.get(s.playerId) ?? 0) + s.knockedOut)
+    }
+
+    const playerStats: PlayerStats[] = Array.from(uniquePlayers.entries()).map(([playerId, name]) => ({
+      playerId,
+      name,
+      totalKnockedOut: scoreByPlayer.get(playerId) ?? 0,
+    }))
+
+    const totalScore = playerStats.reduce((sum, p) => sum + p.totalKnockedOut, 0)
+
+    return {
+      id: t.id,
+      teamId: t.teamId,
+      name: t.name,
+      totalScore,
+      players: playerStats,
+    }
+  })
+
+  return { game: foundGame, teams: teamsWithStats }
 }

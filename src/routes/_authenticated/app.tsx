@@ -17,7 +17,7 @@ function AppPage() {
       <h1 className='mb-6 text-2xl font-bold'>Etusivu</h1>
 
       <div className='space-y-3'>
-        <NavCard to='/game' title='Peli' description='Aloita uusi kyykkapeli.' />
+        <NavCard to='/games/new' title='Peli' description='Aloita uusi kyykkapeli.' />
         <NavCard to='/teams' title='Joukkueet' description='Selaa ja hallinnoi joukkueita.' />
         <NavCard to='/players' title='Pelaajat' description='Selaa ja hallinnoi pelaajia.' />
       </div>
