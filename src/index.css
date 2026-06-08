@@ -199,6 +199,11 @@
   input[type=number] {
     -moz-appearance: textfield;
   }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
 @layer utilities {
