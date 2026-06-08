@@ -17,7 +17,7 @@ import type { Team } from '@/features/teams/schemas'
 
 type Props = {
   player: Player
-  team: Team | null
+  team?: Team | null
   actions?: React.ReactNode
 }
 
@@ -34,7 +34,11 @@ function PlayerItem({ player, team, actions }: Props) {
         <Title style={{ viewTransitionName: `player-name-${player.id}` }}>{player.name}</Title>
         <Description className='flex items-center gap-2'>
           <Mail className='size-3 stroke-3 text-shadow-fuchsia-950' /> {player.email || '-'}
-          <Shield className='size-3 stroke-3 text-shadow-fuchsia-950' /> {team?.name || '-'}
+          {team && (
+            <>
+              <Shield className='size-3 stroke-3 text-shadow-fuchsia-950' />{team?.name || '-'}
+            </>
+          )}
         </Description>
       </ItemContent>
       {actions && (

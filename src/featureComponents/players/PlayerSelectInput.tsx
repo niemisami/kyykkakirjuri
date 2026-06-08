@@ -2,6 +2,7 @@ import { FormSelectInput } from '@/components/form/FormSelectInput'
 import { playersQueryOptions } from '@/features/players/queries'
 import type { Player } from '@/features/players/schemas'
 import { useQuery } from '@tanstack/react-query'
+import PlayerItem from './details/Item'
 
 type Props = {
   /** Filter players to this team's roster. */
@@ -28,6 +29,7 @@ export function PlayerSelectInput({ teamId, value, onChange, excludeIds, label =
       placeholder='Valitse pelaaja'
       items={players}
       value={value}
+      renderItem={player => <PlayerItem player={player} />}
       getLabel={p => p.name}
       getKey={p => p?.id ?? null}
       loading={isLoading}
