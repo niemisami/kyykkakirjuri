@@ -15,9 +15,17 @@ function AppPage() {
   return (
     <div className='mx-auto max-w-2xl px-4 py-8'>
       <h1 className='mb-6 text-2xl font-bold'>Etusivu</h1>
+      <div className='my-10'>
+        <NavCard
+          to='/games/new'
+          title='Uusi peli'
+          description='Aloita kyykkapeli.'
+          isEmphasized
+        />
+      </div>
 
       <div className='space-y-3'>
-        <NavCard to='/games/new' title='Peli' description='Aloita uusi kyykkapeli.' />
+        <NavCard to='/games' title='Vanhat pelit' description='Selaa vanhoja sekä käynnissä olevia pelejä.' />
         <NavCard to='/teams' title='Joukkueet' description='Selaa ja hallinnoi joukkueita.' />
         <NavCard to='/players' title='Pelaajat' description='Selaa ja hallinnoi pelaajia.' />
       </div>

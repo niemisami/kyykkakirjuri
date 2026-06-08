@@ -1,11 +1,18 @@
 import type { LinkProps } from '@tanstack/react-router'
 import { Link } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
+import type { VariantProps } from 'class-variance-authority'
+import { cva } from 'class-variance-authority'
+
 import Description from './typography/Description'
 import Title from './typography/Title'
 import { Item, ItemContent } from './ui/item'
 
-type Props = Omit<LinkProps, 'children'> & (
+type Props = Omit<LinkProps, 'children'> &
+  {
+    className?: string
+    isEmphasized?: boolean
+  } & (
   {
     title: ReactNode
     description?: ReactNode
@@ -17,14 +24,30 @@ type Props = Omit<LinkProps, 'children'> & (
   }
 )
 
+const navCardVariants = cva(
+  '',
+  {
+    variants: {
+      isEmphasized: {
+        true: 'bg-primary text-primary-foreground [a]:hover:bg-primary-container [a]:dark:hover:bg-primary-900 **:data-[slot=item-description]:text-primary-foreground/80',
+        false: null,
+      },
+    },
+    defaultVariants: {
+      isEmphasized: false,
+    },
+  })
+
 function NavCard({
   to,
   params,
   children,
   title,
   description,
+  className,
+  isEmphasized,
   ...linkProps
-}: Props) {
+}: Props & VariantProps<typeof navCardVariants>) {
   const content = children || (
     <ItemContent>
       {title
@@ -43,6 +66,7 @@ function NavCard({
   return (
     <Item
       variant='outline'
+      className={navCardVariants({ isEmphasized, className })}
       {...linkProps}
       render={(
         <Link
