@@ -59,7 +59,7 @@ export function TurnStep({ state }: TurnStepProps) {
   const precedingThrows = activeTurns.flatMap(t => Array.from(t.throws))
 
   return (
-    <div className='mx-auto max-w-[600px] px-4 pt-20 space-y-6'>
+    <div className='mx-auto max-w-150 px-4 pt-4 space-y-6'>
       <Scoreboard
         teamAName={teams[0].name}
         teamBName={teams[1].name}

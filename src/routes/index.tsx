@@ -1,9 +1,10 @@
 import SignInGoogle from '@/blocks/auth/SignInGoogle'
+import { AppIcon } from '@/components/AppIcon'
 import { buttonVariants } from '@/components/ui/button'
 import { getSession } from '@/lib/auth/authFunctions'
 import { cn } from '@/lib/utils'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
-import { BarChart3, Swords, TrendingUp, Users } from 'lucide-react'
+import { BarChart3, TrendingUp, Users } from 'lucide-react'
 
 export const Route = createFileRoute('/')({
   beforeLoad: async () => {
@@ -21,7 +22,8 @@ function LandingPage() {
       <header className='fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md'>
         <nav className='mx-auto flex h-16 max-w-[600px] items-center justify-between px-5'>
           <div className='flex items-center gap-2'>
-            <Swords className='size-6 text-primary' aria-hidden />
+            {/* <AppIcon className='size-6 text-primary' aria-hidden /> */}
+            <AppIcon className='size-6 text-primary' aria-hidden />
             <span className='text-headline-md font-bold tracking-tight text-primary'>
               Kyykkäkirjuri
             </span>
@@ -34,7 +36,7 @@ function LandingPage() {
         <section className='flex flex-col items-center py-8 text-center'>
           <div className='relative mb-4 aspect-square w-full overflow-hidden rounded-xl border border-primary/10 bg-gradient-to-br from-primary-container/30 via-secondary/20 to-primary/10'>
             <div className='absolute inset-0 flex items-center justify-center'>
-              <Swords className='size-40 text-primary/40' strokeWidth={1.25} aria-hidden />
+              <AppIcon className='size-40 text-primary/40' strokeWidth={1.25} aria-hidden />
             </div>
             <div className='absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent' />
             <div className='absolute bottom-0 left-0 right-0 flex items-end p-6'>
@@ -91,7 +93,7 @@ function LandingPage() {
 
         <section className='glass-panel relative mt-8 overflow-hidden rounded-xl border-2 border-primary/40 p-5'>
           <div className='absolute -right-4 -top-4 rotate-12 opacity-5'>
-            <Swords className='size-32' aria-hidden />
+            <AppIcon className='size-32' aria-hidden />
           </div>
           <div className='mb-6 flex items-center justify-between'>
             <span className='text-label-caps text-secondary-foreground'>LIVE-TULOSTAULU</span>
@@ -127,7 +129,7 @@ function LandingPage() {
       <footer className='mt-8 w-full border-t border-border bg-white py-8'>
         <div className='mx-auto flex max-w-[600px] flex-col items-center gap-4 px-5 text-center'>
           <div className='mb-2 flex items-center gap-2'>
-            <Swords className='size-4 text-muted-foreground' aria-hidden />
+            <AppIcon className='size-4 text-muted-foreground' aria-hidden />
             <span className='text-label-caps text-muted-foreground'>Kyykkäkirjuri</span>
           </div>
           <div className='flex flex-wrap justify-center gap-4 text-base text-secondary-foreground'>

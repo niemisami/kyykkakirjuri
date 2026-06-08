@@ -22,18 +22,18 @@ export function Scoreboard({ teamAName, teamBName, round1, round2, roundIndex }:
 
   return (
     <section className='glass-panel rounded-3xl p-6 flex flex-col items-center gap-4 shadow-sm'>
-      <div className='flex justify-between w-full items-start'>
+      <div className='flex justify-between w-full items-center flex-col xs:flex-row xs:items-start gap-y-3'>
         <div className='text-center flex-1'>
           <p className='text-label-caps text-muted-foreground mb-1'>{teamAName.toUpperCase()}</p>
           <p className='text-score-display text-primary transition-all duration-300'>{currentA}</p>
         </div>
 
-        <div className='flex flex-col items-center justify-center px-4 pt-4 gap-1'>
+        <div className='flex flex-col items-center justify-center px-4 gap-1 self-center'>
           <span className='text-label-caps text-muted-foreground bg-muted px-2 py-1 rounded-full'>
             ERÄ {roundIndex + 1}
           </span>
           <p className='text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60'>
-            pistettä
+            pisteet
           </p>
         </div>
 

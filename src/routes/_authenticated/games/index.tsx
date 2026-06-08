@@ -32,7 +32,7 @@ function GamesPage() {
         <h1 className='text-2xl font-bold'>Pelit</h1>
       </div>
 
-      <div>
+      <div className='my-10'>
         <LinkButton
           to='/games/new'
           size='lg'
