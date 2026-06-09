@@ -8,7 +8,7 @@ import viteReact from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [
     devtools(),
-    netlify(),
+    netlify({ edgeSSR: true }),
     tailwindcss(),
     tanstackStart(),
     viteReact(),
