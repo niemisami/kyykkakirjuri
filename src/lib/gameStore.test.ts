@@ -139,7 +139,7 @@ describe('round flow and halftime', () => {
   it('confirmHalftime resets throw progress for round 2', () => {
     freshGame()
     for(let i = 0; i < 8; i++) recordNeutralTeamTurn()
-    confirmHalftime(['A', 'B', 'C', 'D'], ['E', 'F', 'G', 'H'])
+    confirmHalftime([{ name: 'A' }, { name: 'B' }, { name: 'C' }, { name: 'D' }], [{ name: 'E' }, { name: 'F' }, { name: 'G' }, { name: 'H' }])
     expect(gameStore.state.roundIndex).toBe(1)
     expect(gameStore.state.playerThrowIndex).toBe(0)
     expect(gameStore.state.singleThrowIndex).toBe(0)
@@ -460,13 +460,13 @@ describe('confirmHalftime', () => {
   it('transitions from halftime to round', () => {
     reachHalftime()
     expect(gameStore.state.phase).toBe('halftime')
-    confirmHalftime(['Alice', 'Bob', 'Carol', 'Dave'], ['Eve', 'Frank', 'Grace', 'Hank'])
+    confirmHalftime([{ name: 'Alice' }, { name: 'Bob' }, { name: 'Carol' }, { name: 'Dave' }], [{ name: 'Eve' }, { name: 'Frank' }, { name: 'Grace' }, { name: 'Hank' }])
     expect(gameStore.state.phase).toBe('round')
   })
 
   it('sets roundIndex to 1, turnIndex to 0, and playerThrowIndex to 0', () => {
     reachHalftime()
-    confirmHalftime(['A', 'B'], ['C', 'D'])
+    confirmHalftime([{ name: 'A' }, { name: 'B' }], [{ name: 'C' }, { name: 'D' }])
     expect(gameStore.state.roundIndex).toBe(1)
     expect(gameStore.state.turnIndex).toBe(0)
     expect(gameStore.state.playerThrowIndex).toBe(0)
@@ -474,14 +474,14 @@ describe('confirmHalftime', () => {
 
   it('updates player rosters', () => {
     reachHalftime()
-    confirmHalftime(['NewA1', 'NewA2'], ['NewB1'])
+    confirmHalftime([{ name: 'NewA1' }, { name: 'NewA2' }], [{ name: 'NewB1' }])
     expect(gameStore.state.teams[0].players).toEqual(['NewA1', 'NewA2'])
     expect(gameStore.state.teams[1].players).toEqual(['NewB1'])
   })
 
   it('initialises a fresh round 2', () => {
     reachHalftime()
-    confirmHalftime(['A'], ['B'])
+    confirmHalftime([{ name: 'A' }], [{ name: 'B' }])
     const r = gameStore.state.rounds[1]!
     expect(r.teamATurns).toHaveLength(0)
     expect(r.teamBTurns).toHaveLength(0)
@@ -490,7 +490,7 @@ describe('confirmHalftime', () => {
   it('preserves round 1 data', () => {
     reachHalftime()
     const round1Score = getRoundScore(gameStore.state.rounds[0], 0)
-    confirmHalftime(['A'], ['B'])
+    confirmHalftime([{ name: 'A' }], [{ name: 'B' }])
     expect(getRoundScore(gameStore.state.rounds[0], 0)).toBe(round1Score)
   })
 })
@@ -508,7 +508,7 @@ describe('full state machine: setup → round(0) → halftime → round(1) → f
     for(let i = 0; i < 16; i++) recordNeutralTeamTurn()
     expect(gameStore.state.phase).toBe('halftime')
 
-    confirmHalftime(['Alice', 'Bob', 'Carol', 'Dave'], ['Eve', 'Frank', 'Grace', 'Hank'])
+    confirmHalftime([{ name: 'Alice' }, { name: 'Bob' }, { name: 'Carol' }, { name: 'Dave' }], [{ name: 'Eve' }, { name: 'Frank' }, { name: 'Grace' }, { name: 'Hank' }])
     expect(gameStore.state.phase).toBe('round')
     expect(gameStore.state.roundIndex).toBe(1)
 

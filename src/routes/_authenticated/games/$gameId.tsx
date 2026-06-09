@@ -53,7 +53,7 @@ function GameDetailPage() {
         </div>
         <p className='mt-1 text-sm text-muted-foreground'>
           {isFinished
-            ? `Päättynyt ${new Date(game.endedAt).toLocaleDateString('fi-FI', { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+            ? `Päättynyt ${new Date(game.endedAt!).toLocaleDateString('fi-FI', { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
             : 'Käynnissä'}
         </p>
       </div>

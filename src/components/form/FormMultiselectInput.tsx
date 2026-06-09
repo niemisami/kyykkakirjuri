@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
 import { Button } from '../ui/button'
-import type { FormSelectInputProps, SelectBaseProps } from './FormSelectInput'
+import type { SelectBaseProps } from './FormSelectInput'
 
 type Value = string | number | null
 
