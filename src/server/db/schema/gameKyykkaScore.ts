@@ -11,6 +11,8 @@ export const gameKyykkaScore = pgTable('game_kyykka_score', {
   playerId: integer('player_id').notNull().references(() => player.id),
   round: integer('round').notNull(),
   turn: integer('turn').notNull(),
+  /** 0-based index of the player's slot within the throwing pair for this turn (0 or 1) */
+  playerSlot: integer('player_slot').notNull(),
   /** 0-based index of this single throw within the player's two kartut in a turn (0 or 1) */
   throwIndex: integer('throw_index').notNull(),
   knockedOut: integer('knocked_out').notNull(),
@@ -19,5 +21,5 @@ export const gameKyykkaScore = pgTable('game_kyykka_score', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).$default(() => new Date()).$onUpdate(() => new Date()).notNull(),
 },
 table => [
-  uniqueIndex('game_kyykka_score_unique_idx').on(table.gameId, table.teamId, table.playerId, table.round, table.turn, table.throwIndex),
+  uniqueIndex('game_kyykka_score_unique_idx').on(table.gameId, table.teamId, table.round, table.turn, table.playerSlot, table.throwIndex),
 ])

@@ -71,9 +71,9 @@ export const finalizeGameRecord = async ({ gameId, teams, rounds }: FinalizeGame
       return turns.flatMap((turn, teamTurnIdx) => {
         const [player0, player1] = getPlayerPair(roundPlayers, teamTurnIdx)
         return turn.throws.flatMap((throwRecord, i) => {
-          const playerThrowIdx = Math.floor(i / 2) // 0 or 1 (which player in the pair)
+          const playerSlot = Math.floor(i / 2) // 0 or 1 (which player's slot in the pair)
           const throwIndex = i % 2 // 0 or 1 (first or second karttu)
-          const player = playerThrowIdx === 0 ? player0 : player1
+          const player = playerSlot === 0 ? player0 : player1
           if(!player?.id) return []
           return [{
             gameId,
@@ -81,6 +81,7 @@ export const finalizeGameRecord = async ({ gameId, teams, rounds }: FinalizeGame
             playerId: player.id,
             round: roundNumber,
             turn: teamTurnIdx + 1,
+            playerSlot,
             throwIndex,
             knockedOut: throwRecord.knockedOut,
             pappiCount: throwRecord.pappiCount,
