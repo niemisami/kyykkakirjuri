@@ -18,7 +18,8 @@ export function getRouter() {
     context,
     scrollRestoration: true,
     defaultPreload: 'intent',
-    defaultPreloadStaleTime: 0,
+    defaultPreloadStaleTime: 1000 * 30, // 30 seconds
+    defaultPreloadDelay: 200,
     defaultStructuralSharing: true,
   })
 

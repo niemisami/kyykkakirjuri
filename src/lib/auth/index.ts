@@ -27,6 +27,12 @@ export const auth = betterAuth({
     provider: 'pg',
   }),
   plugins: [admin(), tanstackStartCookies()],
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // 5 minutes
+    },
+  },
   socialProviders: {
     google: {
       clientId: env.AUTH_GOOGLE_ID,

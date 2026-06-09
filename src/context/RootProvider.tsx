@@ -31,7 +31,7 @@ export const commonCacheCallbacks = {
   },
 }
 
-// const STALE_TIME_DEFAULT = 1000 * 60 * 5 // 5 minutes
+const STALE_TIME_DEFAULT = 1000 * 30 // 30 seconds
 
 export function getContext() {
   const queryClient = new QueryClient({
@@ -42,7 +42,7 @@ export function getContext() {
         refetchInterval: false,
         refetchOnWindowFocus: true,
         refetchOnMount: true, // Refetches only stale data on mount
-        // staleTime: STALE_TIME_DEFAULT, // Prevent refetches within timeout
+        staleTime: STALE_TIME_DEFAULT, // Prevent refetches within timeout
       },
       mutations: {
       },

@@ -4,10 +4,21 @@ import NavBar from '@/blocks/NavBar'
 import { getSession } from '@/lib/auth/authFunctions'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/_authenticated')({
-  beforeLoad: async () => {
-    const session = await getSession()
+/**
+ * Cache session on client to prevent _authenticated routes from being reloaded on each navigation and link hover.
+ */
+const sessionQuery = () => ({
+  queryKey: ['session'],
+  queryFn: async () => {
+    const data = await getSession()
+    return data
+  },
+  staleTime: 1000 * 60 * 5,
+})
 
+export const Route = createFileRoute('/_authenticated')({
+  beforeLoad: async ({ context }) => {
+    const session = await context.queryClient.ensureQueryData(sessionQuery())
     if(!session) {
       throw redirect({ to: '/' })
     }
