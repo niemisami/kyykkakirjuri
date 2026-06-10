@@ -37,12 +37,8 @@ function PlayersPage() {
     <div className='mx-auto max-w-2xl px-4 py-8'>
       <h1 className='mb-6 text-2xl font-bold'>Pelaajat</h1>
       {players.length === 0
-        ? (
-          <p className='text-muted-foreground text-sm'>Ei pelaajia vielä.</p>
-        )
-        : (
-          <PlayerList players={players} teamsById={teamsById} />
-        )}
+        ? <p className='text-muted-foreground text-sm'>Ei pelaajia vielä.</p>
+        : <PlayerList players={players} teamsById={teamsById} />}
     </div>
   )
 }
